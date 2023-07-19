@@ -9,6 +9,7 @@ const passportFacebook = async (
   res: Response,
   next: NextFunction
 ) => {
+
   passport.serializeUser(function (user, done) {
     done(null, user);
   });

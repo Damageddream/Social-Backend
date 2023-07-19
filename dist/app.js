@@ -49,7 +49,11 @@ app.use((0, helmet_1.default)());
 app.use(database_1.default);
 app.use((0, cors_1.default)({ origin: "*" }));
 app.use((0, morgan_1.default)("dev"));
-app.use((0, express_session_1.default)());
+app.use((0, express_session_1.default)({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+}));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 app.use(authentication_1.default);

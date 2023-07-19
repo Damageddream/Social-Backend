@@ -24,13 +24,19 @@ app.use(helmet());
 app.use(connectToDb);
 app.use(cors({ origin: "*" }));
 app.use(morgan("dev"));
-app.use(session())
+
+app.use(
+  session({
+    secret: process.env.SECRET as string,
+    resave: false,
+    saveUninitialized: false, 
+  })
+);
 
 
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(passportFacebook)
-
 // add parsing
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: false }));
