@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
+import { getSucess, getFailure } from '../controllers/user';
 
 
 
@@ -14,23 +15,11 @@ router.get('/auth/callback',  passport.authenticate("facebook", {
     failureRedirect: "/login/failed",
   }))
 
-router.get('/sucess', (req: Request, res: Response, next: NextFunction)=>{
-    if (req.user) {
-        res.status(200).json({
-          success: true,
-          message: "successfull",
-          user: req.user,
-          cookies: req.cookies
-        });
-      }
-})
+// response after sucesfull login
+router.get('/sucess', getSucess)
 
-router.get("/login/failed", (req, res) => {
-    res.status(401).json({
-      success: false,
-      message: "failure",
-    });
-  });
+// response after fail login
+router.get("/login/failed", getFailure);
 
 
 export default router;
