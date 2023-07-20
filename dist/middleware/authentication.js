@@ -16,18 +16,13 @@ const passport_1 = __importDefault(require("passport"));
 const passport_facebook_1 = require("passport-facebook");
 const user_model_1 = require("../models/user.model");
 const passportFacebook = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    passport_1.default.serializeUser(function (user, done) {
-        done(null, user);
-    });
-    passport_1.default.deserializeUser(function (user, done) {
-        done(null, user);
-    });
     passport_1.default.use(new passport_facebook_1.Strategy({
         clientID: process.env.FB_ID,
         clientSecret: process.env.FB_SECRET,
         callbackURL: "http://localhost:3000/auth/callback",
     }, function (accessToken, refreshToken, profile, done) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('hi');
             try {
                 let user = yield user_model_1.User.findOne({ facebook_id: profile.id }).exec();
                 if (user) {
@@ -49,6 +44,12 @@ const passportFacebook = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             }
         });
     }));
+    passport_1.default.serializeUser(function (user, done) {
+        done(null, user);
+    });
+    passport_1.default.deserializeUser(function (user, done) {
+        done(null, user);
+    });
 });
 exports.default = passportFacebook;
 //# sourceMappingURL=authentication.js.map

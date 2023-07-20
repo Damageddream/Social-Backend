@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -37,9 +46,10 @@ const database_1 = __importDefault(require("./middleware/database"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const passport_1 = __importDefault(require("passport"));
 const routes_1 = __importDefault(require("./routes"));
-const authentication_1 = __importDefault(require("./middleware/authentication"));
 const express_session_1 = __importDefault(require("express-session"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const passport_facebook_1 = require("passport-facebook");
+const user_model_1 = require("./models/user.model");
 dotenv_1.default.config();
 // create app
 const app = (0, express_1.default)();
@@ -56,7 +66,38 @@ app.use((0, express_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-app.use(authentication_1.default);
+//app.use(passportFacebook)
+passport_1.default.use(new passport_facebook_1.Strategy({
+    clientID: process.env.FB_ID,
+    clientSecret: process.env.FB_SECRET,
+    callbackURL: "http://localhost:3000/auth/callback",
+}, function (accessToken, refreshToken, profile, done) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            let user = yield user_model_1.User.findOne({ facebook_id: profile._json.id }).exec();
+            if (user) {
+                done(null, user);
+            }
+            else {
+                user = user_model_1.User.build({
+                    name: profile._json.name,
+                    facebook_id: profile._json.id,
+                });
+                yield user.save();
+                done(null, user);
+            }
+        }
+        catch (err) {
+            done(err);
+        }
+    });
+}));
+passport_1.default.serializeUser(function (user, done) {
+    done(null, user);
+});
+passport_1.default.deserializeUser(function (user, done) {
+    done(null, user);
+});
 // add parsing
 app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.urlencoded({ extended: false }));

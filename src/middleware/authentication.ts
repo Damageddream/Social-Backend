@@ -10,13 +10,7 @@ const passportFacebook = async (
   next: NextFunction
 ) => {
 
-  passport.serializeUser(function (user, done) {
-    done(null, user);
-  });
 
-  passport.deserializeUser(function (user: UserI, done) {
-    done(null, user);
-  });
 
   passport.use(
     new FacebookStrategy(
@@ -26,6 +20,7 @@ const passportFacebook = async (
         callbackURL: "http://localhost:3000/auth/callback",
       },
       async function (accessToken, refreshToken, profile, done) {
+        console.log('hi')
         try {
           let user = await User.findOne({ facebook_id: profile.id }).exec();
 
@@ -48,6 +43,14 @@ const passportFacebook = async (
       }
     )
   );
+
+    passport.serializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function (user: UserI, done) {
+    done(null, user);
+  });
 };
 
 export default passportFacebook;

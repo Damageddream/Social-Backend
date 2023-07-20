@@ -29,9 +29,9 @@ const userSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     facebook_id: { type: String, required: true }
 });
-const User = mongoose_1.default.model("User", userSchema);
-exports.User = User;
 userSchema.statics.build = (attr) => {
     return new User(attr);
 };
+const User = mongoose_1.default.model("User", userSchema);
+exports.User = User;
 //# sourceMappingURL=user.model.js.map

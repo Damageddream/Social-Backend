@@ -12,6 +12,9 @@ import router from "./routes";
 import passportFacebook from "./middleware/authentication";
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import { User } from "./models/user.model";
+import { UserI } from "./interfaces/userI";
 
 
 dotenv.config();
@@ -36,7 +39,44 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(passportFacebook)
+//app.use(passportFacebook)
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FB_ID as string,
+      clientSecret: process.env.FB_SECRET as string,
+      callbackURL: "http://localhost:3000/auth/callback",
+    },
+    async function (accessToken, refreshToken, profile, done) {
+      try {
+        let user = await User.findOne({ facebook_id: profile._json.id }).exec();
+
+        if (user) {
+          done(null, user);
+        } else {
+
+          user = User.build({
+            name: profile._json.name,
+            facebook_id:profile._json.id,
+          });
+
+          await user.save();
+          done(null, user);
+        }
+      } catch (err) {
+        done(err);
+      }
+    }
+  )
+);
+
+  passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (user: UserI, done) {
+  done(null, user);
+});
 // add parsing
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: false }));

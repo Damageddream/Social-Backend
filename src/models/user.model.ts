@@ -8,14 +8,15 @@ const userSchema = new Schema({
     facebook_id: {type: String, required: true}
 })
 
-const User = mongoose.model<UserDoc, UserModelInterface> (
-    "User", userSchema
-)
-
 
 userSchema.statics.build = (attr: UserI) => {
     return new User(attr)
 }
+
+const User = mongoose.model<UserDoc, UserModelInterface> (
+    "User", 
+    userSchema
+)
 
 
 export { User }
