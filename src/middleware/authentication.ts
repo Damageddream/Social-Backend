@@ -9,9 +9,6 @@ const passportFacebook = async (
   res: Response,
   next: NextFunction
 ) => {
-
-
-
   passport.use(
     new FacebookStrategy(
       {
