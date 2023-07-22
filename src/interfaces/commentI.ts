@@ -6,6 +6,7 @@ export interface CommentI {
     timestamp: Date;
     likes: string[];
     post: Types.ObjectId;
+    _id?: string;
 }
 
 export interface CommentIwithID {

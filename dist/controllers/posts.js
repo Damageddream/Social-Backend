@@ -15,7 +15,7 @@ const mongoose_1 = require("mongoose");
 const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const posts = yield post_model_1.Post.find();
-        res.status(200).json(posts);
+        return res.status(200).json(posts);
     }
     catch (err) {
         next(err);
@@ -44,7 +44,7 @@ exports.postPost = postPost;
 const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post = yield post_model_1.Post.findById(req.params.id);
-        res.status(200).json(post);
+        return res.status(200).json(post);
     }
     catch (err) {
         next(err);
@@ -59,7 +59,7 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         }
         try {
             yield post_model_1.Post.findByIdAndRemove(post._id);
-            res.status(201).json({ message: "post removed" });
+            return res.status(200).json({ message: "post removed" });
         }
         catch (err) {
             next(err);
@@ -72,18 +72,29 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.deletePost = deletePost;
 const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, text } = req.body;
-        // author for testing replae with params or req.author
-        const post = post_model_1.Post.build({
-            title,
-            text,
-            author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
-            timestamp: new Date(),
-            likes: [],
-            _id: req.params.id
-        });
-        yield post_model_1.Post.findByIdAndUpdate(req.params.id, post, {});
-        return res.status(201).send(post);
+        const post = yield post_model_1.Post.findById(req.params.id);
+        if (!post) {
+            return res.json({ message: "post does not exists" });
+        }
+        else {
+            try {
+                const { title, text } = req.body;
+                // author for testing replae with params or req.author
+                const postUpdate = post_model_1.Post.build({
+                    title,
+                    text,
+                    author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
+                    timestamp: new Date(),
+                    likes: [],
+                    _id: post._id
+                });
+                yield post_model_1.Post.findByIdAndUpdate(post._id, postUpdate, {});
+                return res.status(201).send(post);
+            }
+            catch (err) {
+                next(err);
+            }
+        }
     }
     catch (err) {
         next(err);

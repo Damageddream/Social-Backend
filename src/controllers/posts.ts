@@ -9,7 +9,7 @@ export const getPosts = async (
 ) => {
   try {
     const posts = await Post.find();
-    res.status(200).json(posts);
+    return res.status(200).json(posts);
   } catch (err: Error | any) {
     next(err);
   }
@@ -44,7 +44,7 @@ export const getPost = async (
 ) => {
   try {
     const post = await Post.findById(req.params.id);
-    res.status(200).json(post);
+    return res.status(200).json(post);
   } catch (err: Error | any) {
     next(err);
   }
@@ -62,7 +62,7 @@ export const deletePost = async (
     }
     try {
         await Post.findByIdAndRemove(post._id)
-        res.status(201).json({message: "post removed"})
+        return res.status(200).json({message: "post removed"})
     } catch (err: Error | any) {
       next(err);
     }
@@ -72,20 +72,31 @@ export const deletePost = async (
 };
 
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+  try{
+    const post = await Post.findById(req.params.id)
+    if (!post) {
+      return res.json({ message: "post does not exists" });
+    } else {
+      try {
         const { title, text } = req.body as { title: string; text: string };
         // author for testing replae with params or req.author
-        const post = Post.build({
+        const postUpdate = Post.build({
           title,
           text,
           author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
           timestamp: new Date(),
           likes: [],
-          _id: req.params.id
+          _id: post._id
         });
-        await Post.findByIdAndUpdate(req.params.id, post, {});
+        await Post.findByIdAndUpdate(post._id, postUpdate, {});
         return res.status(201).send(post);
       } catch (err: Error | any) {
         next(err);
       }
+    }
+
+  } catch (err: Error | any) {
+    next(err);
+  }
+    
     }
