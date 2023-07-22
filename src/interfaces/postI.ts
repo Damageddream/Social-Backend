@@ -6,6 +6,7 @@ export interface PostI {
     author: Types.ObjectId;
     timestamp: Date;
     likes: string[];
+    _id?: string;
 }
 
 export interface PostIwithID {

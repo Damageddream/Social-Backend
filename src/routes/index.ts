@@ -1,8 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import { getSucess, getFailure } from '../controllers/user';
-import { getPosts } from '../controllers/posts';
-import { postPost } from '../controllers/posts';
+import { getPosts , postPost, getPost, deletePost, updatePost} from '../controllers/posts';
 
 
 
@@ -26,9 +25,9 @@ router.get("/login/failed", getFailure);
 //routes for posts
 router.get("/posts", getPosts)
 router.post("/posts", postPost)
-router.get("/posts/:id")
-router.delete("/posts/:id")
-router.put("/posts/:id")
+router.get("/posts/:id", getPost)
+router.delete("/posts/:id", deletePost)
+router.put("/posts/:id", updatePost)
 
 // routes for comments
 router.get("posts/:id/comments")

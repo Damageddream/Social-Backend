@@ -7,7 +7,6 @@ const express_1 = __importDefault(require("express"));
 const passport_1 = __importDefault(require("passport"));
 const user_1 = require("../controllers/user");
 const posts_1 = require("../controllers/posts");
-const posts_2 = require("../controllers/posts");
 const router = express_1.default.Router();
 // connects user with facebook
 router.get('/login/facebook', passport_1.default.authenticate('facebook'));
@@ -22,10 +21,10 @@ router.get('/sucess', user_1.getSucess);
 router.get("/login/failed", user_1.getFailure);
 //routes for posts
 router.get("/posts", posts_1.getPosts);
-router.post("/posts", posts_2.postPost);
-router.get("/posts/:id");
-router.delete("/posts/:id");
-router.put("/posts/:id");
+router.post("/posts", posts_1.postPost);
+router.get("/posts/:id", posts_1.getPost);
+router.delete("/posts/:id", posts_1.deletePost);
+router.put("/posts/:id", posts_1.updatePost);
 // routes for comments
 router.get("posts/:id/comments");
 router.post("posts/:id/comments");

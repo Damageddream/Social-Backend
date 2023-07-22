@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postPost = exports.getPosts = void 0;
+exports.updatePost = exports.deletePost = exports.getPost = exports.postPost = exports.getPosts = void 0;
 const post_model_1 = require("../models/post.model");
 const mongoose_1 = require("mongoose");
 const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -26,7 +26,13 @@ const postPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { title, text } = req.body;
         // author for testing replae with params or req.author
-        const post = post_model_1.Post.build({ title, text, author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"), timestamp: new Date(), likes: [] });
+        const post = post_model_1.Post.build({
+            title,
+            text,
+            author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
+            timestamp: new Date(),
+            likes: [],
+        });
         yield post.save();
         return res.status(201).send(post);
     }
@@ -35,4 +41,53 @@ const postPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.postPost = postPost;
+const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield post_model_1.Post.findById(req.params.id);
+        res.status(200).json(post);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.getPost = getPost;
+const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield post_model_1.Post.findById(req.params.id);
+        if (!post) {
+            return res.json({ message: "post does not exists" });
+        }
+        try {
+            yield post_model_1.Post.findByIdAndRemove(post._id);
+            res.status(201).json({ message: "post removed" });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.deletePost = deletePost;
+const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, text } = req.body;
+        // author for testing replae with params or req.author
+        const post = post_model_1.Post.build({
+            title,
+            text,
+            author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
+            timestamp: new Date(),
+            likes: [],
+            _id: req.params.id
+        });
+        yield post_model_1.Post.findByIdAndUpdate(req.params.id, post, {});
+        return res.status(201).send(post);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.updatePost = updatePost;
 //# sourceMappingURL=posts.js.map
