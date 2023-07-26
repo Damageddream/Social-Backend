@@ -25,3 +25,13 @@ export const getFailure = (req: Request, res: Response, next: NextFunction) => {
         message: "failure",
       });
 }
+
+export const getLogout = (req: Request, res: Response, next: NextFunction) => {
+  req.logout((err: Error) => {
+    if(err){
+      return next(err)
+    }
+    res.redirect(process.env.CLIENT_URL as string)
+  });
+
+}

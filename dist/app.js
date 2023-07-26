@@ -57,16 +57,19 @@ const port = process.env.PORT || 3000;
 // add middlewares from libraries
 app.use((0, helmet_1.default)());
 app.use(database_1.default);
-app.use((0, cors_1.default)({ origin: "*" }));
+app.use((0, cors_1.default)({ origin: "*", credentials: true, }));
 app.use((0, morgan_1.default)("dev"));
 app.use((0, express_session_1.default)({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+    }
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-//app.use(passportFacebook)
 passport_1.default.use(new passport_facebook_1.Strategy({
     clientID: process.env.FB_ID,
     clientSecret: process.env.FB_SECRET,

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFailure = exports.getSucess = void 0;
+exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 // sucesfull login response
 const getSucess = (req, res, next) => {
     if (req.user) {
@@ -26,4 +26,13 @@ const getFailure = (req, res, next) => {
     });
 };
 exports.getFailure = getFailure;
+const getLogout = (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect(process.env.CLIENT_URL);
+    });
+};
+exports.getLogout = getLogout;
 //# sourceMappingURL=user.js.map

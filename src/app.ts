@@ -9,7 +9,6 @@ import connectToDb from "./middleware/database";
 import dotenv from "dotenv";
 import passport from 'passport'
 import router from "./routes";
-import passportFacebook from "./middleware/authentication";
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import { Strategy as FacebookStrategy } from "passport-facebook";
@@ -25,21 +24,24 @@ const port = process.env.PORT || 3000;
 // add middlewares from libraries
 app.use(helmet());
 app.use(connectToDb);
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "*", credentials: true, }));
 app.use(morgan("dev"));
 
 app.use(
   session({
     secret: process.env.SECRET as string,
     resave: false,
-    saveUninitialized: false, 
+    saveUninitialized: true,
+    cookie: {
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+    } 
   })
 );
 
 
 app.use(passport.initialize());
 app.use(passport.session());
-//app.use(passportFacebook)
 passport.use(
   new FacebookStrategy(
     {
