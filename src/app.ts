@@ -24,7 +24,7 @@ const port = process.env.PORT || 3000;
 // add middlewares from libraries
 app.use(helmet());
 app.use(connectToDb);
-app.use(cors({ origin: "*", credentials: true, }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true, }));
 app.use(morgan("dev"));
 
 app.use(

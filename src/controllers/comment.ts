@@ -18,7 +18,7 @@ export const getComments = async (
 export const postComment = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction 
 ) => {
   try {
     const text = req.body.text;

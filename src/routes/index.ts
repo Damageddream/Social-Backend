@@ -13,8 +13,8 @@ router.get('/login/facebook', passport.authenticate('facebook'));
 
 //Facebook url callback on sucess or failure response
 router.get('/auth/callback',  passport.authenticate("facebook", {
-    successRedirect: "http://127.0.0.1:5173",
-    failureRedirect: "/login/failed",
+    successRedirect: "http://localhost:5173/",
+    failureRedirect: "/login/failed", 
   }))
 
 // response after sucesfull login
