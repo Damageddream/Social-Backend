@@ -14,6 +14,7 @@ import cookieParser from 'cookie-parser';
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { User } from "./models/user.model";
 import { UserI } from "./interfaces/userI";
+const path = require('path');
 
 
 dotenv.config();
@@ -21,10 +22,13 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
+//add static files
+app.use('/static', express.static(path.join(__dirname, 'public')))
+
 // add middlewares from libraries
 app.use(helmet());
 app.use(connectToDb);
-app.use(cors({ origin: "http://127.0.0.1:5173", credentials: true, }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true, }));
 app.use(morgan("dev"));
 
 app.use(
@@ -48,18 +52,18 @@ passport.use(
       clientID: process.env.FB_ID as string,
       clientSecret: process.env.FB_SECRET as string,
       callbackURL: "http://localhost:3000/auth/callback",
+      profileFields: ['id', 'displayName', 'picture.type(large)', 'email']
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
         let user = await User.findOne({ facebook_id: profile._json.id }).exec();
-
         if (user) {
           done(null, user);
         } else {
-
           user = User.build({
             name: profile._json.name,
             facebook_id:profile._json.id,
+            photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`
           });
 
           await user.save();

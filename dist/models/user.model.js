@@ -27,7 +27,8 @@ exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
-    facebook_id: { type: String, required: true }
+    facebook_id: { type: String, required: true },
+    photo: { type: String }
 });
 userSchema.statics.build = (attr) => {
     return new User(attr);
