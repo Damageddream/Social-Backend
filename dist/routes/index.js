@@ -13,7 +13,7 @@ const router = express_1.default.Router();
 router.get('/login/facebook', passport_1.default.authenticate('facebook'));
 //Facebook url callback on sucess or failure response
 router.get('/auth/callback', passport_1.default.authenticate("facebook", {
-    successRedirect: "http://localhost:5173/wall",
+    successRedirect: "http://127.0.0.1:5173/wall",
     failureRedirect: "/login/failed",
 }));
 // response after sucesfull login
