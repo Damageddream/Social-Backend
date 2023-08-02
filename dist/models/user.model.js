@@ -28,7 +28,8 @@ const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     facebook_id: { type: String, required: true },
-    photo: { type: String }
+    photo: { type: String },
+    token: { type: String, require: true },
 });
 userSchema.statics.build = (attr) => {
     return new User(attr);

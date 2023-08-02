@@ -83,13 +83,18 @@ passport_1.default.use(new passport_facebook_1.Strategy({
         try {
             let user = yield user_model_1.User.findOne({ facebook_id: profile._json.id }).exec();
             if (user) {
+                if (user.token !== accessToken) {
+                    user.token = accessToken;
+                    yield user_model_1.User.findByIdAndUpdate(user._id, user, {});
+                }
                 done(null, user);
             }
             else {
                 user = user_model_1.User.build({
                     name: profile._json.name,
                     facebook_id: profile._json.id,
-                    photo: profile.photos ? profile.photos[0].value : `http://localhost:${port}/static/user.png`
+                    photo: profile.photos ? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
+                    token: accessToken,
                 });
                 yield user.save();
                 done(null, user);

@@ -58,12 +58,17 @@ passport.use(
       try {
         let user = await User.findOne({ facebook_id: profile._json.id }).exec();
         if (user) {
+          if(user.token !== accessToken){
+            user.token = accessToken
+            await User.findByIdAndUpdate(user._id, user, {})
+          }
           done(null, user);
         } else {
           user = User.build({
             name: profile._json.name,
             facebook_id:profile._json.id,
-            photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`
+            photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
+            token: accessToken,
           });
 
           await user.save();

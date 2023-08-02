@@ -6,7 +6,8 @@ import { UserI, UserDoc, UserModelInterface } from "../interfaces/userI";
 const userSchema = new Schema({
     name: {type: String, required: true},
     facebook_id: {type: String, required: true},
-    photo: {type: String} 
+    photo: {type: String},
+    token: {type: String, require: true},
 })
 
 

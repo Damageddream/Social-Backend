@@ -10,27 +10,27 @@ const posts_1 = require("../controllers/posts");
 const comment_1 = require("../controllers/comment");
 const router = express_1.default.Router();
 // connects user with facebook
-router.get('/login/facebook', passport_1.default.authenticate('facebook'));
+router.get("/login/facebook", passport_1.default.authenticate("facebook"));
 //Facebook url callback on sucess or failure response
-router.get('/auth/callback', passport_1.default.authenticate("facebook", {
+router.get("/auth/callback", passport_1.default.authenticate("facebook", {
     successRedirect: "http://localhost:5173/wall",
     failureRedirect: "/login/failed",
 }));
 // response after sucesfull login
-router.get('/sucess', user_1.getSucess);
+router.get("/sucess", user_1.getSucess);
 // response after fail login
 router.get("/login/failed", user_1.getFailure);
 //routes for posts
-router.get("/posts", passport_1.default.authenticate('facebook'), posts_1.getPosts);
-router.post("/posts", passport_1.default.authenticate('facebook'), posts_1.postPost);
-router.get("/posts/:id", passport_1.default.authenticate('facebook'), posts_1.getPost);
-router.delete("/posts/:id", passport_1.default.authenticate('facebook'), posts_1.deletePost);
-router.put("/posts/:id", passport_1.default.authenticate('facebook'), posts_1.updatePost);
+router.get("/posts", passport_1.default.authenticate("facebook-token", { session: false }), posts_1.getPosts);
+router.post("/posts", posts_1.postPost);
+router.get("/posts/:id", posts_1.getPost);
+router.delete("/posts/:id", posts_1.deletePost);
+router.put("/posts/:id", posts_1.updatePost);
 // routes for comments
-router.get("/posts/:postId/comments", passport_1.default.authenticate('facebook'), comment_1.getComments);
-router.post("/posts/:postId/comments", passport_1.default.authenticate('facebook'), comment_1.postComment);
-router.get("/posts/:postId/comments/:commentId", passport_1.default.authenticate('facebook'), comment_1.getComment);
-router.delete("/posts/:postId/comments/:commentId", passport_1.default.authenticate('facebook'), comment_1.deleteComment);
-router.put("/posts/:postId/comments/:commentId", passport_1.default.authenticate('facebook'), comment_1.updateComment);
+router.get("/posts/:postId/comments", comment_1.getComments);
+router.post("/posts/:postId/comments", comment_1.postComment);
+router.get("/posts/:postId/comments/:commentId", comment_1.getComment);
+router.delete("/posts/:postId/comments/:commentId", comment_1.deleteComment);
+router.put("/posts/:postId/comments/:commentId", comment_1.updateComment);
 exports.default = router;
 //# sourceMappingURL=index.js.map
