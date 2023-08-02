@@ -24,18 +24,18 @@ router.get('/sucess', getSucess)
 router.get("/login/failed", getFailure);
 
 //routes for posts
-router.get("/posts", getPosts)
-router.post("/posts", postPost)
-router.get("/posts/:id", getPost)
-router.delete("/posts/:id", deletePost)
-router.put("/posts/:id", updatePost)
+router.get("/posts", passport.authenticate('facebook'),getPosts)
+router.post("/posts",passport.authenticate('facebook'), postPost)
+router.get("/posts/:id",passport.authenticate('facebook'), getPost)
+router.delete("/posts/:id", passport.authenticate('facebook'), deletePost)
+router.put("/posts/:id", passport.authenticate('facebook'), updatePost)
 
 // routes for comments
-router.get("/posts/:postId/comments", getComments)
-router.post("/posts/:postId/comments", postComment)
-router.get("/posts/:postId/comments/:commentId", getComment)
-router.delete("/posts/:postId/comments/:commentId", deleteComment)
-router.put("/posts/:postId/comments/:commentId", updateComment)
+router.get("/posts/:postId/comments", passport.authenticate('facebook'), getComments)
+router.post("/posts/:postId/comments", passport.authenticate('facebook'), postComment)
+router.get("/posts/:postId/comments/:commentId", passport.authenticate('facebook'), getComment)
+router.delete("/posts/:postId/comments/:commentId", passport.authenticate('facebook'), deleteComment)
+router.put("/posts/:postId/comments/:commentId", passport.authenticate('facebook'), updateComment)
 
 
 
