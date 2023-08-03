@@ -95,6 +95,7 @@ passport_1.default.use(new passport_facebook_1.Strategy({
                     facebook_id: profile._json.id,
                     photo: profile.photos ? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
                     token: accessToken,
+                    friends: [],
                 });
                 yield user.save();
                 done(null, user);

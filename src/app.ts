@@ -69,6 +69,7 @@ passport.use(
             facebook_id:profile._json.id,
             photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
             token: accessToken,
+            friends: [],
           });
 
           await user.save();

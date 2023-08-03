@@ -8,6 +8,7 @@ const userSchema = new Schema({
     facebook_id: {type: String, required: true},
     photo: {type: String},
     token: {type: String, require: true},
+    friends: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
 })
 
 

@@ -1,10 +1,11 @@
-import mongoose, {Document, Model } from "mongoose";
+import mongoose, {Document, Model, Types } from "mongoose";
 
 export interface UserI {
     name: string;
     facebook_id: string;
     photo?: string;
     token: string;
+    friends: Types.ObjectId[];
 }
 
 export interface UserIwithID {
@@ -13,6 +14,7 @@ export interface UserIwithID {
     _id: string;
     photo?: string;
     token: string;
+    friends: Types.ObjectId[];
 }
 
 export interface UserDoc extends Document {
@@ -21,6 +23,7 @@ export interface UserDoc extends Document {
     _id:string;
     photo?: string;
     token: string;
+    friends: Types.ObjectId[];
 }
 
 export interface UserModelInterface extends Model<UserDoc> {
