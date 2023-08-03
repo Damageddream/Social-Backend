@@ -32,5 +32,8 @@ router.post("/posts/:postId/comments", comment_1.postComment);
 router.get("/posts/:postId/comments/:commentId", comment_1.getComment);
 router.delete("/posts/:postId/comments/:commentId", comment_1.deleteComment);
 router.put("/posts/:postId/comments/:commentId", comment_1.updateComment);
+//routes for users
+router.get("/users");
+router.get("/users/nofriends", passport_1.default.authenticate("facebook-token", { session: false }), user_1.getNoFriends);
 exports.default = router;
 //# sourceMappingURL=index.js.map

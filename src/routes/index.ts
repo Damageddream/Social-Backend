@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure } from "../controllers/user";
+import { getSucess, getFailure, getNoFriends } from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -49,5 +49,9 @@ router.post("/posts/:postId/comments", postComment);
 router.get("/posts/:postId/comments/:commentId", getComment);
 router.delete("/posts/:postId/comments/:commentId", deleteComment);
 router.put("/posts/:postId/comments/:commentId", updateComment);
+
+//routes for users
+router.get("/users")
+router.get("/users/nofriends", passport.authenticate("facebook-token", {session: false}), getNoFriends)
 
 export default router;
