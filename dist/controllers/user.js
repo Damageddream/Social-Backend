@@ -8,25 +8,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // sucesfull login response
-const getSucess = (req, res, next) => {
+const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
-        res.status(200).json({
-            success: true,
-            message: "successfull",
-            user: req.user,
-            cookies: req.cookies,
-        });
+        const userRequest = req.user;
+        try {
+            const user = yield user_model_1.User.findById(req.user);
+            const secret = process.env.SECRET;
+            const token = jsonwebtoken_1.default.sign({ user }, secret);
+            return res.status(200).json({
+                success: true,
+                message: "successfull",
+                user,
+                token,
+            });
+        }
+        catch (err) {
+            next(err);
+        }
     }
     else {
         res.status(401).json({
             message: "problem with authentication",
         });
     }
-};
+});
 exports.getSucess = getSucess;
 // failure login reponse
 const getFailure = (req, res, next) => {

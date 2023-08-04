@@ -11,6 +11,7 @@ import passport from 'passport'
 import router from "./routes";
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
+import { Strategy as JWTStrategy, ExtractJwt as ExtractJWT } from 'passport-jwt';
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { User } from "./models/user.model";
 import { UserI } from "./interfaces/userI";
@@ -46,6 +47,29 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.SECRET, 
+};
+
+passport.use(
+  new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
+    try {
+      // Find the user based on the provided token payload
+      const user = await User.findById(jwtPayload.user._id);
+      if(user) {
+        return done(null, user)
+      } else {
+        // If user is not found, return false to indicate authentication failure
+        return done(null, false)
+      }
+    } catch (error) {
+      return done(error, false)
+    }
+  })
+)
+
 passport.use(
   new FacebookStrategy(
     {
@@ -58,17 +82,12 @@ passport.use(
       try {
         let user = await User.findOne({ facebook_id: profile._json.id }).exec();
         if (user) {
-          if(user.token !== accessToken){
-            user.token = accessToken
-            await User.findByIdAndUpdate(user._id, user, {})
-          }
           done(null, user);
         } else {
           user = User.build({
             name: profile._json.name,
             facebook_id:profile._json.id,
             photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
-            token: accessToken,
             friends: [],
           });
 

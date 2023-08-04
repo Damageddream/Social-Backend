@@ -48,6 +48,7 @@ const passport_1 = __importDefault(require("passport"));
 const routes_1 = __importDefault(require("./routes"));
 const express_session_1 = __importDefault(require("express-session"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const passport_jwt_1 = require("passport-jwt");
 const passport_facebook_1 = require("passport-facebook");
 const user_model_1 = require("./models/user.model");
 const path = require('path');
@@ -73,6 +74,26 @@ app.use((0, express_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
+const jwtOptions = {
+    jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.SECRET,
+};
+passport_1.default.use(new passport_jwt_1.Strategy(jwtOptions, (jwtPayload, done) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find the user based on the provided token payload
+        const user = yield user_model_1.User.findById(jwtPayload.user._id);
+        if (user) {
+            return done(null, user);
+        }
+        else {
+            // If user is not found, return false to indicate authentication failure
+            return done(null, false);
+        }
+    }
+    catch (error) {
+        return done(error, false);
+    }
+})));
 passport_1.default.use(new passport_facebook_1.Strategy({
     clientID: process.env.FB_ID,
     clientSecret: process.env.FB_SECRET,

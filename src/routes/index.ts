@@ -37,8 +37,8 @@ router.get("/sucess", getSucess);
 router.get("/login/failed", getFailure);
 
 //routes for posts
-router.get("/posts", passport.authenticate("facebook-token", {session: false}), getPosts);
-router.post("/posts", postPost);
+router.get("/posts", passport.authenticate("jwt", {session: false}), getPosts);
+router.post("/posts",passport.authenticate("jwt", {session: false}), postPost);
 router.get("/posts/:id", getPost);
 router.delete("/posts/:id", deletePost);
 router.put("/posts/:id", updatePost);
@@ -52,6 +52,6 @@ router.put("/posts/:postId/comments/:commentId", updateComment);
 
 //routes for users
 router.get("/users")
-router.get("/users/nofriends", passport.authenticate("facebook-token", {session: false}), getNoFriends)
+router.get("/users/nofriends", passport.authenticate("jwt", {session: false}), getNoFriends)
 
 export default router;

@@ -21,8 +21,8 @@ router.get("/sucess", user_1.getSucess);
 // response after fail login
 router.get("/login/failed", user_1.getFailure);
 //routes for posts
-router.get("/posts", passport_1.default.authenticate("facebook-token", { session: false }), posts_1.getPosts);
-router.post("/posts", posts_1.postPost);
+router.get("/posts", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPosts);
+router.post("/posts", passport_1.default.authenticate("jwt", { session: false }), posts_1.postPost);
 router.get("/posts/:id", posts_1.getPost);
 router.delete("/posts/:id", posts_1.deletePost);
 router.put("/posts/:id", posts_1.updatePost);
@@ -34,6 +34,6 @@ router.delete("/posts/:postId/comments/:commentId", comment_1.deleteComment);
 router.put("/posts/:postId/comments/:commentId", comment_1.updateComment);
 //routes for users
 router.get("/users");
-router.get("/users/nofriends", passport_1.default.authenticate("facebook-token", { session: false }), user_1.getNoFriends);
+router.get("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.getNoFriends);
 exports.default = router;
 //# sourceMappingURL=index.js.map

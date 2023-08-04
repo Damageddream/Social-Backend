@@ -4,7 +4,6 @@ export interface UserI {
     name: string;
     facebook_id: string;
     photo?: string;
-    token: string;
     friends: Types.ObjectId[];
 }
 
@@ -13,7 +12,6 @@ export interface UserIwithID {
     facebook_id: string;
     _id: string;
     photo?: string;
-    token: string;
     friends: Types.ObjectId[];
 }
 
@@ -22,7 +20,6 @@ export interface UserDoc extends Document {
     facebook_id : string;
     _id:string;
     photo?: string;
-    token: string;
     friends: Types.ObjectId[];
 }
 
