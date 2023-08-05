@@ -39,16 +39,16 @@ router.get("/login/failed", getFailure);
 //routes for posts
 router.get("/posts", passport.authenticate("jwt", {session: false}), getPosts);
 router.post("/posts",passport.authenticate("jwt", {session: false}), postPost);
-router.get("/posts/:id", getPost);
-router.delete("/posts/:id", deletePost);
-router.put("/posts/:id", updatePost);
+router.get("/posts/:id", passport.authenticate("jwt", {session: false}),getPost);
+router.delete("/posts/:id", passport.authenticate("jwt", {session: false}),deletePost);
+router.put("/posts/:id", passport.authenticate("jwt", {session: false}),updatePost);
 
 // routes for comments
-router.get("/posts/:postId/comments", getComments);
-router.post("/posts/:postId/comments", postComment);
-router.get("/posts/:postId/comments/:commentId", getComment);
-router.delete("/posts/:postId/comments/:commentId", deleteComment);
-router.put("/posts/:postId/comments/:commentId", updateComment);
+router.get("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),getComments);
+router.post("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),postComment);
+router.get("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),getComment);
+router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),deleteComment);
+router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),updateComment);
 
 //routes for users
 router.get("/users")

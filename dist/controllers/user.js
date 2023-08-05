@@ -70,7 +70,31 @@ const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.getUsers = getUsers;
 const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.user);
+        if (req.user) {
+            const userWithId = req.user;
+            const user = yield user_model_1.User.findById(userWithId._id.toString());
+            // array of friends of user
+            // !! map to change object id into string id when adding freind will be added
+            // !! also add req.user id to that array
+            const friends = user === null || user === void 0 ? void 0 : user.friends.map((friend) => {
+                return friend.toString();
+            });
+            if (friends) {
+                friends.push(userWithId._id.toString());
+            }
+            // array of all users there are no friends with user
+            const noFriends = yield user_model_1.User.find({ _id: { $nin: friends } });
+            return res.status(200).json({
+                success: true,
+                noFriends
+            });
+        }
+        else {
+            return res.status(401).json({
+                success: false,
+                message: "request must be send by user"
+            });
+        }
     }
     catch (err) {
         next(err);

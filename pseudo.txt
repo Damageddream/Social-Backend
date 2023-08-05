@@ -1,0 +1,4 @@
+friends request:
+     from front send request with id of user you want to invite to friends
+     to that user document add freindinvite object with (ref to user that is sending and accept)
+     if user invited declines remove invitation, if accepts remove from invitations and add to freinds array
