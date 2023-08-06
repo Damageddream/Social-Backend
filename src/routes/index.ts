@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure, getNoFriends } from "../controllers/user";
+import { getSucess, getFailure, getNoFriends, postInvite } from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -50,8 +50,8 @@ router.get("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {s
 router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),deleteComment);
 router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),updateComment);
 
-//routes for users
+//routes for users interactions
 router.get("/users")
 router.get("/users/nofriends", passport.authenticate("jwt", {session: false}), getNoFriends)
-
+router.post("/users/nofriends", passport.authenticate("jwt", {session: false}), postInvite)
 export default router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // sucesfull login response
@@ -86,13 +86,13 @@ const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             const noFriends = yield user_model_1.User.find({ _id: { $nin: friends } });
             return res.status(200).json({
                 success: true,
-                noFriends
+                noFriends,
             });
         }
         else {
             return res.status(401).json({
                 success: false,
-                message: "request must be send by user"
+                message: "request must be send by user",
             });
         }
     }
@@ -101,4 +101,15 @@ const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.getNoFriends = getNoFriends;
+const postInvite = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return res.status(200).json({
+            message: "success",
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.postInvite = postInvite;
 //# sourceMappingURL=user.js.map

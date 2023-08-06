@@ -68,33 +68,46 @@ export const getNoFriends = async (
   next: NextFunction
 ) => {
   try {
-    if(req.user){
-      const userWithId = req.user as CustomUser
-      const user = await User.findById(userWithId._id.toString()) 
+    if (req.user) {
+      const userWithId = req.user as CustomUser;
+      const user = await User.findById(userWithId._id.toString());
       // array of friends of user
       // !! map to change object id into string id when adding freind will be added
       // !! also add req.user id to that array
-      const friends = user?.friends.map((friend)=>{
-        return friend.toString()
-      })
-      if(friends){
-        friends.push(userWithId._id.toString())
+      const friends = user?.friends.map((friend) => {
+        return friend.toString();
+      });
+      if (friends) {
+        friends.push(userWithId._id.toString());
       }
-     
+
       // array of all users there are no friends with user
-      const noFriends = await User.find({_id:{$nin: friends}})
+      const noFriends = await User.find({ _id: { $nin: friends } });
       return res.status(200).json({
         success: true,
-        noFriends
-      })
+        noFriends,
+      });
     } else {
       return res.status(401).json({
         success: false,
-        message: "request must be send by user"
-      })
+        message: "request must be send by user",
+      });
     }
-
   } catch (err) {
+    next(err);
+  }
+};
+
+export const postInvite = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    return res.status(200).json({
+      message: "success",
+    });
+  } catch (err: Error | any) {
     next(err);
   }
 };

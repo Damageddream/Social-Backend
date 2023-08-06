@@ -79,7 +79,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     } else {
       try {
         const { title, text } = req.body as { title: string; text: string };
-        // author for testing replae with params or req.author
+        // author for testing replace with params or req.author
         const postUpdate = Post.build({
           title,
           text,

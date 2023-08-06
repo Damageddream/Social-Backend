@@ -79,7 +79,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         else {
             try {
                 const { title, text } = req.body;
-                // author for testing replae with params or req.author
+                // author for testing replace with params or req.author
                 const postUpdate = post_model_1.Post.build({
                     title,
                     text,
