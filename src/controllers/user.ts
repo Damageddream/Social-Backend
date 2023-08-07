@@ -147,3 +147,13 @@ export const postInvite = async (
     next(err);
   }
 };
+
+export const getInvites = async (req: Request, res: Response, next: NextFunction) => {
+  const user= req.user as CustomUser;
+  try {
+    const userWithInvites = await User.findById(user._id).populate("invites")
+    res.status(200).json(userWithInvites)  
+  } catch (err: Error | any) {
+    next(err);
+  }
+}

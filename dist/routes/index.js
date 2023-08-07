@@ -36,5 +36,6 @@ router.put("/posts/:postId/comments/:commentId", passport_1.default.authenticate
 router.get("/users");
 router.get("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.getNoFriends);
 router.post("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.postInvite);
+router.get("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.getInvites);
 exports.default = router;
 //# sourceMappingURL=index.js.map

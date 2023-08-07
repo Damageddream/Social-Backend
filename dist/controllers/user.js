@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -140,4 +140,15 @@ const postInvite = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.postInvite = postInvite;
+const getInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    try {
+        const userWithInvites = yield user_model_1.User.findById(user._id).populate("invites");
+        res.status(200).json(userWithInvites);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.getInvites = getInvites;
 //# sourceMappingURL=user.js.map
