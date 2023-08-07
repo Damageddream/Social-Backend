@@ -90,6 +90,7 @@ passport.use(
             photo: profile.photos? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
             friends: [],
             invites: [],
+            invitesSent: [],
           });
 
           await user.save();

@@ -8,6 +8,7 @@ export interface UserI {
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
+    invitesSent: Types.ObjectId[];
 }
 
 export interface UserIwithID {
@@ -17,6 +18,7 @@ export interface UserIwithID {
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
+    invitesSent: Types.ObjectId[];
 }
 
 export interface UserDoc extends Document {
@@ -26,6 +28,7 @@ export interface UserDoc extends Document {
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
+    invitesSent: Types.ObjectId[];
 }
 
 export interface UserModelInterface extends Model<UserDoc> {

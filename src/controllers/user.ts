@@ -3,6 +3,7 @@ import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
 import { UserIwithID } from "../interfaces/userI";
 import { CustomUser } from "../interfaces/userI";
+import mongoose from "mongoose";
 
 // sucesfull login response
 export const getSucess = async (
@@ -72,14 +73,15 @@ export const getNoFriends = async (
       const userWithId = req.user as CustomUser;
       const user = await User.findById(userWithId._id.toString());
       // array of friends of user
-      // !! map to change object id into string id when adding freind will be added
-      // !! also add req.user id to that array
-      const friends = user?.friends.map((friend) => {
-        return friend.toString();
+      const friends: string[] = [];
+      user?.friends.forEach((friend) => {
+        friends.push(friend.toString());
       });
-      if (friends) {
-        friends.push(userWithId._id.toString());
-      }
+      user?.invitesSent.forEach((friend) => {
+        friends.push(friend.toString());
+      });
+
+      friends.push(userWithId._id.toString());
 
       // array of all users there are no friends with user
       const noFriends = await User.find({ _id: { $nin: friends } });
@@ -104,8 +106,42 @@ export const postInvite = async (
   next: NextFunction
 ) => {
   try {
+    const userRequesting = req.user as CustomUser;
+    const { id } = req.body;
+    const objectId = new mongoose.Types.ObjectId(id);
+    const user = await User.findById(userRequesting._id.toString());
+    const friend = await User.findById(id);
+
+    if (user?.friends.includes(objectId)) {
+      return res.status(409).json({ message: "you are already friends" });
+    }
+    if (user?.invitesSent.includes(objectId)) {
+      return res
+        .status(409)
+        .json({ message: "you are already sent request to that user" });
+    }
+
+    const updatedUser = { $push: { invitesSent: objectId } };
+    const updatedFriend = { $push: { invites: userRequesting._id } };
+
+    try {
+      await User.findByIdAndUpdate(
+        userRequesting._id.toString(),
+        updatedUser,
+        {}
+      );
+      await User.findByIdAndUpdate(id, updatedFriend, {});
+      return res.status(200).json({
+        sucess: true,
+        message: "invite send sucessfully",
+      });
+    } catch (err: Error | any) {
+      next(err);
+    }
+
     return res.status(200).json({
-      message: "success",
+      sucess: true,
+      message: "invite send sucessfully",
     });
   } catch (err: Error | any) {
     next(err);

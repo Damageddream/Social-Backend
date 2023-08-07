@@ -30,7 +30,8 @@ const userSchema = new mongoose_1.Schema({
     facebook_id: { type: String, required: true },
     photo: { type: String },
     friends: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }],
-    invites: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }]
+    invites: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }],
+    invitesSent: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }],
 });
 userSchema.statics.build = (attr) => {
     return new User(attr);

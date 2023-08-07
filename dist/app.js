@@ -113,6 +113,7 @@ passport_1.default.use(new passport_facebook_1.Strategy({
                     photo: profile.photos ? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
                     friends: [],
                     invites: [],
+                    invitesSent: [],
                 });
                 yield user.save();
                 done(null, user);

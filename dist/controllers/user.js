@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mongoose_1 = __importDefault(require("mongoose"));
 // sucesfull login response
 const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
@@ -74,14 +75,14 @@ const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             const userWithId = req.user;
             const user = yield user_model_1.User.findById(userWithId._id.toString());
             // array of friends of user
-            // !! map to change object id into string id when adding freind will be added
-            // !! also add req.user id to that array
-            const friends = user === null || user === void 0 ? void 0 : user.friends.map((friend) => {
-                return friend.toString();
+            const friends = [];
+            user === null || user === void 0 ? void 0 : user.friends.forEach((friend) => {
+                friends.push(friend.toString());
             });
-            if (friends) {
-                friends.push(userWithId._id.toString());
-            }
+            user === null || user === void 0 ? void 0 : user.invitesSent.forEach((friend) => {
+                friends.push(friend.toString());
+            });
+            friends.push(userWithId._id.toString());
             // array of all users there are no friends with user
             const noFriends = yield user_model_1.User.find({ _id: { $nin: friends } });
             return res.status(200).json({
@@ -103,8 +104,35 @@ const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.getNoFriends = getNoFriends;
 const postInvite = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const userRequesting = req.user;
+        const { id } = req.body;
+        const objectId = new mongoose_1.default.Types.ObjectId(id);
+        const user = yield user_model_1.User.findById(userRequesting._id.toString());
+        const friend = yield user_model_1.User.findById(id);
+        if (user === null || user === void 0 ? void 0 : user.friends.includes(objectId)) {
+            return res.status(409).json({ message: "you are already friends" });
+        }
+        if (user === null || user === void 0 ? void 0 : user.invitesSent.includes(objectId)) {
+            return res
+                .status(409)
+                .json({ message: "you are already sent request to that user" });
+        }
+        const updatedUser = { $push: { invitesSent: objectId } };
+        const updatedFriend = { $push: { invites: userRequesting._id } };
+        try {
+            yield user_model_1.User.findByIdAndUpdate(userRequesting._id.toString(), updatedUser, {});
+            yield user_model_1.User.findByIdAndUpdate(id, updatedFriend, {});
+            return res.status(200).json({
+                sucess: true,
+                message: "invite send sucessfully",
+            });
+        }
+        catch (err) {
+            next(err);
+        }
         return res.status(200).json({
-            message: "success",
+            sucess: true,
+            message: "invite send sucessfully",
         });
     }
     catch (err) {

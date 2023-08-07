@@ -8,7 +8,8 @@ const userSchema = new Schema({
     facebook_id: {type: String, required: true},
     photo: {type: String},
     friends: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-    invites: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
+    invites: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+    invitesSent: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
 })
 
 
