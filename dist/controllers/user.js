@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -107,8 +107,11 @@ const postInvite = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const userRequesting = req.user;
         const { id } = req.body;
         const objectId = new mongoose_1.default.Types.ObjectId(id);
+        // const [user, friend] = await Promise.all([
+        //   await User.findById(userRequesting._id.toString()),
+        //   await User.findById(id)
+        // ])
         const user = yield user_model_1.User.findById(userRequesting._id.toString());
-        const friend = yield user_model_1.User.findById(id);
         if (user === null || user === void 0 ? void 0 : user.friends.includes(objectId)) {
             return res.status(409).json({ message: "you are already friends" });
         }
@@ -151,4 +154,34 @@ const getInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getInvites = getInvites;
+const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, answer } = req.body;
+        const userRequesting = req.user;
+        const objectId = new mongoose_1.default.Types.ObjectId(id);
+        const [userAnswering, userTargeted] = yield Promise.all([
+            user_model_1.User.findById(userRequesting._id),
+            user_model_1.User.findById(id)
+        ]);
+        // check if users are not already friends and return if they are
+        if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.friends.includes(objectId)) {
+            return res.status(409).json({ message: "you already are friends" });
+        }
+        if (userTargeted === null || userTargeted === void 0 ? void 0 : userTargeted.friends.includes(userRequesting._id)) {
+            return res.status(409).json({ message: "you already are friends" });
+        }
+        if (answer === "accept") {
+            const updatedUserRequesting = { $push: { friends: objectId } };
+            const updatedUserTargeted = { $push: { friends: userRequesting._id } };
+        }
+        else if (answer === "denie") {
+            console.log(answer);
+        }
+        return res.status(200);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.postInvites = postInvites;
 //# sourceMappingURL=user.js.map

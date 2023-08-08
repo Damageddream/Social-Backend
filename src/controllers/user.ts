@@ -109,8 +109,11 @@ export const postInvite = async (
     const userRequesting = req.user as CustomUser;
     const { id } = req.body;
     const objectId = new mongoose.Types.ObjectId(id);
+    // const [user, friend] = await Promise.all([
+    //   await User.findById(userRequesting._id.toString()),
+    //   await User.findById(id)
+    // ])
     const user = await User.findById(userRequesting._id.toString());
-    const friend = await User.findById(id);
 
     if (user?.friends.includes(objectId)) {
       return res.status(409).json({ message: "you are already friends" });
@@ -148,12 +151,53 @@ export const postInvite = async (
   }
 };
 
-export const getInvites = async (req: Request, res: Response, next: NextFunction) => {
-  const user= req.user as CustomUser;
+export const getInvites = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user as CustomUser;
   try {
-    const userWithInvites = await User.findById(user._id).populate("invites")
-    res.status(200).json(userWithInvites)  
+    const userWithInvites = await User.findById(user._id).populate("invites");
+    res.status(200).json(userWithInvites);
   } catch (err: Error | any) {
     next(err);
   }
-}
+};
+
+export const postInvites = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {id, answer} = req.body
+    const userRequesting = req.user as CustomUser;
+    const objectId= new mongoose.Types.ObjectId(id)
+    
+    const [userAnswering, userTargeted ] = await Promise.all([
+      User.findById(userRequesting._id),
+      User.findById(id)
+    ])
+
+    // check if users are not already friends and return if they are
+    if(userAnswering?.friends.includes(objectId)){
+      return res.status(409).json({message: "you already are friends"})
+    }
+    if(userTargeted?.friends.includes(userRequesting._id)){
+      return res.status(409).json({message: "you already are friends"})
+    }
+
+
+    if(answer === "accept"){
+      const updatedUserRequesting = {$push: {friends: objectId}}
+      const updatedUserTargeted = {$push: {friends: userRequesting._id}}
+    } 
+    else if(answer === "denie") {
+      console.log(answer)
+    }
+    return res.status(200)
+  } catch (err: Error | any) {
+    next(err);
+  }
+};
