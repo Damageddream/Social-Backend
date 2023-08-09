@@ -176,9 +176,10 @@ export const postInvites = async (
     const objectId = new mongoose.Types.ObjectId(id);
 
     const [userAnswering, userTargeted] = await Promise.all([
-      User.findById(userRequesting._id),
+      User.findById(userRequesting._id), 
       User.findById(id),
     ]);
+
 
     // check if users are not already friends and return if they are
     if (userAnswering?.friends.includes(objectId)) {
@@ -208,7 +209,7 @@ export const postInvites = async (
     if (userAnswering?.invitesSent.includes(objectId)) {
       updatedUserRequesting = {
         ...updatedUserRequesting,
-        $pull: { invitesSent: objectId },
+        $pull: { invitesSent: objectId },  
       };
     }
     if (userTargeted?.invites.includes(userRequesting._id)) {
