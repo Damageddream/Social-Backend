@@ -171,32 +171,71 @@ export const postInvites = async (
   next: NextFunction
 ) => {
   try {
-    const {id, answer} = req.body
+    const { id, answer } = req.body;
     const userRequesting = req.user as CustomUser;
-    const objectId= new mongoose.Types.ObjectId(id)
-    
-    const [userAnswering, userTargeted ] = await Promise.all([
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    const [userAnswering, userTargeted] = await Promise.all([
       User.findById(userRequesting._id),
-      User.findById(id)
-    ])
+      User.findById(id),
+    ]);
 
     // check if users are not already friends and return if they are
-    if(userAnswering?.friends.includes(objectId)){
-      return res.status(409).json({message: "you already are friends"})
+    if (userAnswering?.friends.includes(objectId)) {
+      return res.status(409).json({ message: "you already are friends" });
     }
-    if(userTargeted?.friends.includes(userRequesting._id)){
-      return res.status(409).json({message: "you already are friends"})
+    if (userTargeted?.friends.includes(userRequesting._id)) {
+      return res.status(409).json({ message: "you already are friends" });
     }
 
+    // if invite accepted, add users to friends and remove from invites
+    let updatedUserRequesting;
+    let updatedUserTargeted;
 
-    if(answer === "accept"){
-      const updatedUserRequesting = {$push: {friends: objectId}}
-      const updatedUserTargeted = {$push: {friends: userRequesting._id}}
-    } 
-    else if(answer === "denie") {
-      console.log(answer)
+    if (answer === "accept") {
+      updatedUserRequesting = {
+        $push: { friends: objectId },
+        $pull: { invites: objectId },
+      };
+      updatedUserTargeted = {
+        $push: { friends: userRequesting._id },
+        $pull: { invitesSent: userRequesting._id },
+      };
+    } else if (answer === "denie") {
+      updatedUserRequesting = { $pull: { invites: objectId } };
+      updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
     }
-    return res.status(200)
+    if (userAnswering?.invitesSent.includes(objectId)) {
+      updatedUserRequesting = {
+        ...updatedUserRequesting,
+        $pull: { invitesSent: objectId },
+      };
+    }
+    if (userTargeted?.invites.includes(userRequesting._id)) {
+      updatedUserTargeted = {
+        ...updatedUserTargeted,
+        $pull: { invites: userRequesting._id },
+      };
+    }
+
+    try {
+      const updatedUser = User.findByIdAndUpdate(
+        userRequesting._id,
+        updatedUserRequesting,
+        {}
+      );
+      const updatedFriend = User.findByIdAndUpdate(
+        objectId,
+        updatedUserTargeted,
+        {}
+      );
+      await Promise.all([updatedUser, updatedFriend]);
+    } catch (err: Error | any) {
+      next(err);
+    }
+    return res
+      .status(200)
+      .json({ sucess: true, message: "invite was handle correctly" });
   } catch (err: Error | any) {
     next(err);
   }

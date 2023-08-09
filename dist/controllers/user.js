@@ -161,7 +161,7 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         const objectId = new mongoose_1.default.Types.ObjectId(id);
         const [userAnswering, userTargeted] = yield Promise.all([
             user_model_1.User.findById(userRequesting._id),
-            user_model_1.User.findById(id)
+            user_model_1.User.findById(id),
         ]);
         // check if users are not already friends and return if they are
         if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.friends.includes(objectId)) {
@@ -170,14 +170,40 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         if (userTargeted === null || userTargeted === void 0 ? void 0 : userTargeted.friends.includes(userRequesting._id)) {
             return res.status(409).json({ message: "you already are friends" });
         }
+        // if invite accepted, add users to friends and remove from invites
+        let updatedUserRequesting;
+        let updatedUserTargeted;
         if (answer === "accept") {
-            const updatedUserRequesting = { $push: { friends: objectId } };
-            const updatedUserTargeted = { $push: { friends: userRequesting._id } };
+            updatedUserRequesting = {
+                $push: { friends: objectId },
+                $pull: { invites: objectId },
+            };
+            updatedUserTargeted = {
+                $push: { friends: userRequesting._id },
+                $pull: { invitesSent: userRequesting._id },
+            };
         }
         else if (answer === "denie") {
-            console.log(answer);
+            updatedUserRequesting = { $pull: { invites: objectId } };
+            updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
         }
-        return res.status(200);
+        if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.invitesSent.includes(objectId)) {
+            updatedUserRequesting = Object.assign(Object.assign({}, updatedUserRequesting), { $pull: { invitesSent: objectId } });
+        }
+        if (userTargeted === null || userTargeted === void 0 ? void 0 : userTargeted.invites.includes(userRequesting._id)) {
+            updatedUserTargeted = Object.assign(Object.assign({}, updatedUserTargeted), { $pull: { invites: userRequesting._id } });
+        }
+        try {
+            const updatedUser = user_model_1.User.findByIdAndUpdate(userRequesting._id, updatedUserRequesting, {});
+            const updatedFriend = user_model_1.User.findByIdAndUpdate(objectId, updatedUserTargeted, {});
+            yield Promise.all([updatedUser, updatedFriend]);
+        }
+        catch (err) {
+            next(err);
+        }
+        return res
+            .status(200)
+            .json({ sucess: true, message: "invite was handle correctly" });
     }
     catch (err) {
         next(err);
