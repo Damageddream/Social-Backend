@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 // sucesfull login response
 const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
@@ -210,4 +211,34 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.postInvites = postInvites;
+const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, password } = req.body;
+    try {
+        const user = user_model_1.User.build({
+            name,
+            password,
+            photo: req.file ? `http://localhost:3000/static/${req.file.filename}` : "http://localhost:3000/static/user.png",
+            friends: [],
+            invites: [],
+            invitesSent: [],
+        });
+        console.log(user);
+        if (user.password) {
+            bcryptjs_1.default.hash(user.password, 10, (err, hashedPassword) => __awaiter(void 0, void 0, void 0, function* () {
+                if (err) {
+                    next(err);
+                }
+                else {
+                    user.password = hashedPassword;
+                    yield user.save();
+                    return res.status(201).json({ success: true, message: "New user was registered" });
+                }
+            }));
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.postRegister = postRegister;
 //# sourceMappingURL=user.js.map

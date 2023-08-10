@@ -132,7 +132,7 @@ passport_1.default.deserializeUser(function (user, done) {
 });
 // add parsing
 app.use((0, cookie_parser_1.default)());
-app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.use((0, body_parser_1.json)());
 app.use('/', routes_1.default);

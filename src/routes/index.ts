@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites } from "../controllers/user";
+import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister } from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -15,8 +15,23 @@ import {
   deleteComment,
   updateComment,
 } from "../controllers/comment";
+import multer from "multer";
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req,file,cb)=>{
+    const uploadDirectory = path.join(__dirname, '../public')
+    cb(null,uploadDirectory)
+  },
+  filename:(req,file,cb) => {
+    const uniqueSuffix = Date.now()+"-"+Math.round(Math.random()*1E9)
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname+"-"+uniqueSuffix+ext)
+  }
+})
 
 const router = express.Router();
+const upload = multer({ storage: storage})
 
 // connects user with facebook
 router.get("/login/facebook", passport.authenticate("facebook"));
@@ -56,4 +71,5 @@ router.get("/users/nofriends", passport.authenticate("jwt", {session: false}), g
 router.post("/users/nofriends", passport.authenticate("jwt", {session: false}), postInvite)
 router.get("/users/invites", passport.authenticate("jwt", {session: false}), getInvites)
 router.post("/users/invites", passport.authenticate("jwt", {session: false}), postInvites)
+router.post("/users/register", upload.single("file"),postRegister)
 export default router;

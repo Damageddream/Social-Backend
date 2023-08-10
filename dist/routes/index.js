@@ -8,7 +8,21 @@ const passport_1 = __importDefault(require("passport"));
 const user_1 = require("../controllers/user");
 const posts_1 = require("../controllers/posts");
 const comment_1 = require("../controllers/comment");
+const multer_1 = __importDefault(require("multer"));
+const path = require('path');
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDirectory = path.join(__dirname, '../public');
+        cb(null, uploadDirectory);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+    }
+});
 const router = express_1.default.Router();
+const upload = (0, multer_1.default)({ storage: storage });
 // connects user with facebook
 router.get("/login/facebook", passport_1.default.authenticate("facebook"));
 //Facebook url callback on sucess or failure response
@@ -38,5 +52,6 @@ router.get("/users/nofriends", passport_1.default.authenticate("jwt", { session:
 router.post("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.postInvite);
 router.get("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.getInvites);
 router.post("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.postInvites);
+router.post("/users/register", upload.single("file"), user_1.postRegister);
 exports.default = router;
 //# sourceMappingURL=index.js.map

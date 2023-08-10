@@ -4,31 +4,34 @@ import { Request } from "express";
 
 export interface UserI {
     name: string;
-    facebook_id: string;
+    facebook_id?: string;
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
     invitesSent: Types.ObjectId[];
+    password?: string;
 }
 
 export interface UserIwithID {
     name: string;
-    facebook_id: string;
+    facebook_id?: string;
     _id: string;
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
     invitesSent: Types.ObjectId[];
+    password?: string;
 }
 
 export interface UserDoc extends Document {
     name: string;
-    facebook_id : string;
+    facebook_id?: string;
     _id:string;
     photo?: string;
     friends: Types.ObjectId[];
     invites: Types.ObjectId[];
     invitesSent: Types.ObjectId[];
+    password?: string;
 }
 
 export interface UserModelInterface extends Model<UserDoc> {

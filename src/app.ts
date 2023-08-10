@@ -15,6 +15,8 @@ import { Strategy as JWTStrategy, ExtractJwt as ExtractJWT } from 'passport-jwt'
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { User } from "./models/user.model";
 import { UserI } from "./interfaces/userI";
+
+
 const path = require('path');
 
 
@@ -112,13 +114,12 @@ passport.deserializeUser(function (user: UserI, done) {
 });
 // add parsing
 app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(json());
 
+
 app.use('/', router);
-
-
 
 // add error handiling
 app.use(notFound);
