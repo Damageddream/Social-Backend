@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -241,4 +241,9 @@ const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.postRegister = postRegister;
+const postLogin = (req, res, next) => {
+    console.log(req.body);
+    return res.status(200).json({ message: "nice" });
+};
+exports.postLogin = postLogin;
 //# sourceMappingURL=user.js.map

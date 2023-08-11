@@ -53,5 +53,6 @@ router.post("/users/nofriends", passport_1.default.authenticate("jwt", { session
 router.get("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.getInvites);
 router.post("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.postInvites);
 router.post("/users/register", upload.single("file"), user_1.postRegister);
+router.post("/users/login", user_1.postLogin);
 exports.default = router;
 //# sourceMappingURL=index.js.map

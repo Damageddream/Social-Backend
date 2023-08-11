@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister } from "../controllers/user";
+import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister, postLogin } from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -72,4 +72,5 @@ router.post("/users/nofriends", passport.authenticate("jwt", {session: false}), 
 router.get("/users/invites", passport.authenticate("jwt", {session: false}), getInvites)
 router.post("/users/invites", passport.authenticate("jwt", {session: false}), postInvites)
 router.post("/users/register", upload.single("file"),postRegister)
+router.post("/users/login", postLogin)
 export default router;

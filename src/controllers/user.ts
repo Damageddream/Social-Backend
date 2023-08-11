@@ -273,3 +273,8 @@ export const postInvites = async (
         next(err);
       }
   }
+
+  export const postLogin = (req:Request, res: Response, next: NextFunction) => {
+    console.log(req.body)
+    return res.status(200).json({message: "nice"})
+  }

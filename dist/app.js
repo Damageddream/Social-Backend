@@ -51,17 +51,17 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const passport_jwt_1 = require("passport-jwt");
 const passport_facebook_1 = require("passport-facebook");
 const user_model_1 = require("./models/user.model");
-const path = require('path');
+const path = require("path");
 dotenv_1.default.config();
 // create app
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 //add static files
-app.use('/static', express_1.default.static(path.join(__dirname, 'public')));
+app.use("/static", express_1.default.static(path.join(__dirname, "public")));
 // add middlewares from libraries
 app.use((0, helmet_1.default)());
 app.use(database_1.default);
-app.use((0, cors_1.default)({ origin: "http://localhost:5173", credentials: true, }));
+app.use((0, cors_1.default)({ origin: ["http://localhost:5173", "http://127.0.0.1:5173"], credentials: true }));
 app.use((0, morgan_1.default)("dev"));
 app.use((0, express_session_1.default)({
     secret: process.env.SECRET,
@@ -70,7 +70,7 @@ app.use((0, express_session_1.default)({
     cookie: {
         secure: false,
         maxAge: 24 * 60 * 60 * 1000,
-    }
+    },
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
@@ -98,7 +98,7 @@ passport_1.default.use(new passport_facebook_1.Strategy({
     clientID: process.env.FB_ID,
     clientSecret: process.env.FB_SECRET,
     callbackURL: "http://localhost:3000/auth/callback",
-    profileFields: ['id', 'displayName', 'picture.type(large)', 'email']
+    profileFields: ["id", "displayName", "picture.type(large)", "email"],
 }, function (accessToken, refreshToken, profile, done) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -110,7 +110,9 @@ passport_1.default.use(new passport_facebook_1.Strategy({
                 user = user_model_1.User.build({
                     name: profile._json.name,
                     facebook_id: profile._json.id,
-                    photo: profile.photos ? profile.photos[0].value : `http://localhost:${port}/static/user.png`,
+                    photo: profile.photos
+                        ? profile.photos[0].value
+                        : `http://localhost:${port}/static/user.png`,
                     friends: [],
                     invites: [],
                     invitesSent: [],
@@ -135,7 +137,7 @@ app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.use((0, body_parser_1.json)());
-app.use('/', routes_1.default);
+app.use("/", routes_1.default);
 // add error handiling
 app.use(notFound_1.default);
 app.use(errorHandler_1.default);
