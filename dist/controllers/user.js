@@ -217,12 +217,13 @@ const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const user = user_model_1.User.build({
             name,
             password,
-            photo: req.file ? `http://localhost:3000/static/${req.file.filename}` : "http://localhost:3000/static/user.png",
+            photo: req.file
+                ? `http://localhost:3000/static/${req.file.filename}`
+                : "http://localhost:3000/static/user.png",
             friends: [],
             invites: [],
             invitesSent: [],
         });
-        console.log(user);
         if (user.password) {
             bcryptjs_1.default.hash(user.password, 10, (err, hashedPassword) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err) {
@@ -231,7 +232,9 @@ const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 else {
                     user.password = hashedPassword;
                     yield user.save();
-                    return res.status(201).json({ success: true, message: "New user was registered" });
+                    return res
+                        .status(201)
+                        .json({ success: true, message: "New user was registered" });
                 }
             }));
         }
@@ -241,9 +244,37 @@ const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.postRegister = postRegister;
-const postLogin = (req, res, next) => {
-    console.log(req.body);
-    return res.status(200).json({ message: "nice" });
-};
+const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username, password } = req.body;
+    try {
+        const user = yield user_model_1.User.findOne({ name: username });
+        if (!user) {
+            const err = new Error("User does not exists");
+            return next(err);
+        }
+        if (user.password) {
+            bcryptjs_1.default.compare(password, user.password, (err, ress) => {
+                if (ress) {
+                    const secret = process.env.SECRET;
+                    const token = jsonwebtoken_1.default.sign({ user }, secret);
+                    return res
+                        .status(200)
+                        .json({ status: "success", message: "auth passed", token });
+                }
+                else {
+                    const err = new Error("User does not match");
+                    return next(err);
+                }
+            });
+        }
+        else {
+            const err = new Error("Problem with password");
+            return next(err);
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
 exports.postLogin = postLogin;
 //# sourceMappingURL=user.js.map

@@ -6,7 +6,6 @@ import { CustomUser } from "../interfaces/userI";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-
 // sucesfull login response
 export const getSucess = async (
   req: Request,
@@ -178,10 +177,9 @@ export const postInvites = async (
     const objectId = new mongoose.Types.ObjectId(id);
 
     const [userAnswering, userTargeted] = await Promise.all([
-      User.findById(userRequesting._id), 
+      User.findById(userRequesting._id),
       User.findById(id),
     ]);
-
 
     // check if users are not already friends and return if they are
     if (userAnswering?.friends.includes(objectId)) {
@@ -211,7 +209,7 @@ export const postInvites = async (
     if (userAnswering?.invitesSent.includes(objectId)) {
       updatedUserRequesting = {
         ...updatedUserRequesting,
-        $pull: { invitesSent: objectId },  
+        $pull: { invitesSent: objectId },
       };
     }
     if (userTargeted?.invites.includes(userRequesting._id)) {
@@ -244,37 +242,72 @@ export const postInvites = async (
   }
 };
 
+export const postRegister = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { name, password } = req.body as { name: string; password: string };
 
-  export const postRegister = async (req: Request, res: Response, next: NextFunction) => {
-      const {name, password} = req.body as {name: string; password: string}
-      
-      try{
-        const user = User.build({
-          name,
-          password,
-          photo: req.file? `http://localhost:3000/static/${req.file.filename}` : "http://localhost:3000/static/user.png",
-          friends: [],
-          invites: [],
-          invitesSent: [],
-        })
-        console.log(user)
-        if(user.password){
-          bcrypt.hash(user.password, 10, async(err, hashedPassword)=>{
-            if(err){
-              next(err);
-            } else {
-              user.password = hashedPassword
-              await user.save()
-              return res.status(201).json({success: true, message: "New user was registered"})
-            }
-          })
+  try {
+    const user = User.build({
+      name,
+      password,
+      photo: req.file
+        ? `http://localhost:3000/static/${req.file.filename}`
+        : "http://localhost:3000/static/user.png",
+      friends: [],
+      invites: [],
+      invitesSent: [],
+    });
+    if (user.password) {
+      bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
+        if (err) {
+          next(err);
+        } else {
+          user.password = hashedPassword;
+          await user.save();
+          return res
+            .status(201)
+            .json({ success: true, message: "New user was registered" });
         }
-      } catch (err: Error | any) {
-        next(err);
-      }
+      });
+    }
+  } catch (err: Error | any) {
+    next(err);
   }
+};
 
-  export const postLogin = (req:Request, res: Response, next: NextFunction) => {
-    console.log(req.body)
-    return res.status(200).json({message: "nice"})
+export const postLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ name: username });
+    if (!user) {
+      const err = new Error("User does not exists");
+      return next(err);
+    }
+    if (user.password) {
+      bcrypt.compare(password, user.password, (err, ress) => {
+        if (ress) {
+          const secret = process.env.SECRET as string;
+          const token = jwt.sign({ user }, secret);
+          return res
+            .status(200)
+            .json({ status: "success", message: "auth passed", token });
+        } else {
+          const err = new Error("User does not match");
+          return next(err);
+        }
+      });
+    }else {
+      const err = new Error("Problem with password");
+      return next(err);
+    }
+  } catch (err: Error | any) {
+    next(err);
   }
+};
