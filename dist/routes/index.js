@@ -27,7 +27,7 @@ const upload = (0, multer_1.default)({ storage: storage });
 router.get("/login/facebook", passport_1.default.authenticate("facebook"));
 //Facebook url callback on sucess or failure response
 router.get("/auth/callback", passport_1.default.authenticate("facebook", {
-    successRedirect: "http://localhost:5173/wall",
+    successRedirect: "http://localhost:5173/loginFacebook",
     failureRedirect: "/login/failed",
 }));
 // response after sucesfull login

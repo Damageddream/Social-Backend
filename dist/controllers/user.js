@@ -259,7 +259,7 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                     const token = jsonwebtoken_1.default.sign({ user }, secret);
                     return res
                         .status(200)
-                        .json({ status: "success", message: "auth passed", token });
+                        .json({ status: "success", message: "auth passed", token, user });
                 }
                 else {
                     const err = new Error("User does not match");

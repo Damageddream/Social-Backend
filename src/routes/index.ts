@@ -40,7 +40,7 @@ router.get("/login/facebook", passport.authenticate("facebook"));
 router.get(
   "/auth/callback",
   passport.authenticate("facebook", {
-    successRedirect: "http://localhost:5173/wall",
+    successRedirect: "http://localhost:5173/loginFacebook",
     failureRedirect: "/login/failed",
   })
 );

@@ -297,7 +297,7 @@ export const postLogin = async (
           const token = jwt.sign({ user }, secret);
           return res
             .status(200)
-            .json({ status: "success", message: "auth passed", token });
+            .json({ status: "success", message: "auth passed", token, user });
         } else {
           const err = new Error("User does not match");
           return next(err);
