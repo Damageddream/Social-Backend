@@ -48,6 +48,7 @@ router.delete("/posts/:postId/comments/:commentId", passport_1.default.authentic
 router.put("/posts/:postId/comments/:commentId", passport_1.default.authenticate("jwt", { session: false }), comment_1.updateComment);
 //routes for users interactions
 router.get("/users");
+router.get("/users/friends", passport_1.default.authenticate("jwt", { session: false }), user_1.getFriends);
 router.get("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.getNoFriends);
 router.post("/users/nofriends", passport_1.default.authenticate("jwt", { session: false }), user_1.postInvite);
 router.get("/users/invites", passport_1.default.authenticate("jwt", { session: false }), user_1.getInvites);

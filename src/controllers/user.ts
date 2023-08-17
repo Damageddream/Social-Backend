@@ -64,6 +64,17 @@ export const getUsers = async (
   }
 };
 
+export const getFriends = async (req: Request, res: Response, next: NextFunction) =>{ 
+  try {
+   const userWithId = req.user as CustomUser;
+   const user = await User.findById(userWithId._id.toString()).populate("friends");
+   return res.status(200).json(user)
+
+  } catch (err) {
+    next(err);
+  }
+}
+
 export const getNoFriends = async (
   req: Request,
   res: Response,

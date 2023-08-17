@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister, postLogin } from "../controllers/user";
+import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister, postLogin, getFriends} from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -67,6 +67,7 @@ router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {s
 
 //routes for users interactions
 router.get("/users")
+router.get("/users/friends", passport.authenticate("jwt",{session: false}), getFriends)
 router.get("/users/nofriends", passport.authenticate("jwt", {session: false}), getNoFriends)
 router.post("/users/nofriends", passport.authenticate("jwt", {session: false}), postInvite)
 router.get("/users/invites", passport.authenticate("jwt", {session: false}), getInvites)

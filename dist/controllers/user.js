@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -70,6 +70,17 @@ const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getUsers = getUsers;
+const getFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userWithId = req.user;
+        const user = yield user_model_1.User.findById(userWithId._id.toString()).populate("friends");
+        return res.status(200).json(user);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.getFriends = getFriends;
 const getNoFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.user) {
