@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Post } from "../models/post.model";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
+import { CustomUser } from "../interfaces/userI";
 
 export const getPosts = async (
   req: Request,
@@ -100,3 +101,10 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
   }
     
     }
+
+  export const getPostsWall = async (req: Request, res: Response, next: NextFunction) => {
+    const userRequesting = req.user as CustomUser;
+    const friendsAndUserPosts: Types.ObjectId[] = []
+    console.log(userRequesting)
+    return res.status(200).json({message: "testing"})
+  }

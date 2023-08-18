@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePost = exports.deletePost = exports.getPost = exports.postPost = exports.getPosts = void 0;
+exports.getPostsWall = exports.updatePost = exports.deletePost = exports.getPost = exports.postPost = exports.getPosts = void 0;
 const post_model_1 = require("../models/post.model");
 const mongoose_1 = require("mongoose");
 const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -101,4 +101,11 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.updatePost = updatePost;
+const getPostsWall = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userRequesting = req.user;
+    const friendsAndUserPosts = [];
+    console.log(userRequesting);
+    return res.status(200).json({ message: "testing" });
+});
+exports.getPostsWall = getPostsWall;
 //# sourceMappingURL=posts.js.map

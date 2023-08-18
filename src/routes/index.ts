@@ -7,6 +7,7 @@ import {
   getPost,
   deletePost,
   updatePost,
+  getPostsWall,
 } from "../controllers/posts";
 import {
   getComments,
@@ -57,6 +58,7 @@ router.post("/posts",passport.authenticate("jwt", {session: false}), postPost);
 router.get("/posts/:id", passport.authenticate("jwt", {session: false}),getPost);
 router.delete("/posts/:id", passport.authenticate("jwt", {session: false}),deletePost);
 router.put("/posts/:id", passport.authenticate("jwt", {session: false}),updatePost);
+router.get("/posts/wall", passport.authenticate("jwt", {session: false}), getPostsWall)
 
 // routes for comments
 router.get("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),getComments);
