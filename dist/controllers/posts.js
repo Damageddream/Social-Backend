@@ -23,13 +23,13 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.getPosts = getPosts;
 const postPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
     try {
         const { title, text } = req.body;
-        // author for testing replae with params or req.author
         const post = post_model_1.Post.build({
             title,
             text,
-            author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
+            author: user._id,
             timestamp: new Date(),
             likes: [],
         });
@@ -86,7 +86,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                     author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
                     timestamp: new Date(),
                     likes: [],
-                    _id: post._id
+                    _id: post._id,
                 });
                 yield post_model_1.Post.findByIdAndUpdate(post._id, postUpdate, {});
                 return res.status(201).send(post);
@@ -103,9 +103,15 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.updatePost = updatePost;
 const getPostsWall = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userRequesting = req.user;
-    const friendsAndUserPosts = [];
-    console.log(userRequesting);
-    return res.status(200).json({ message: "testing" });
+    const friendsAndUserPosts = [...userRequesting.friends, userRequesting._id];
+    try {
+        const posts = yield post_model_1.Post.find({ author: { $in: friendsAndUserPosts } });
+        console.log(posts);
+        return res.status(200).json({ success: true, message: "sucesfully fetched posts", posts });
+    }
+    catch (err) {
+        next(err);
+    }
 });
 exports.getPostsWall = getPostsWall;
 //# sourceMappingURL=posts.js.map

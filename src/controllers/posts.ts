@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Post } from "../models/post.model";
-import mongoose, { Types } from "mongoose";
-import { CustomUser } from "../interfaces/userI";
+import  { Types } from "mongoose";
+import {UserWithObjectsIDs } from "../interfaces/userI";
 
 export const getPosts = async (
   req: Request,
@@ -21,13 +21,13 @@ export const postPost = async (
   res: Response,
   next: NextFunction
 ) => {
+  const user = req.user as UserWithObjectsIDs
   try {
     const { title, text } = req.body as { title: string; text: string };
-    // author for testing replae with params or req.author
     const post = Post.build({
       title,
       text,
-      author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
+      author: user._id,
       timestamp: new Date(),
       likes: [],
     });
@@ -62,8 +62,8 @@ export const deletePost = async (
       return res.json({ message: "post does not exists" });
     }
     try {
-        await Post.findByIdAndRemove(post._id)
-        return res.status(200).json({message: "post removed"})
+      await Post.findByIdAndRemove(post._id);
+      return res.status(200).json({ message: "post removed" });
     } catch (err: Error | any) {
       next(err);
     }
@@ -72,9 +72,13 @@ export const deletePost = async (
   }
 };
 
-export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
-  try{
-    const post = await Post.findById(req.params.id)
+export const updatePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const post = await Post.findById(req.params.id);
     if (!post) {
       return res.json({ message: "post does not exists" });
     } else {
@@ -87,7 +91,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
           author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
           timestamp: new Date(),
           likes: [],
-          _id: post._id
+          _id: post._id,
         });
         await Post.findByIdAndUpdate(post._id, postUpdate, {});
         return res.status(201).send(post);
@@ -95,16 +99,23 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
         next(err);
       }
     }
-
   } catch (err: Error | any) {
     next(err);
   }
-    
-    }
+};
 
-  export const getPostsWall = async (req: Request, res: Response, next: NextFunction) => {
-    const userRequesting = req.user as CustomUser;
-    const friendsAndUserPosts: Types.ObjectId[] = []
-    console.log(userRequesting)
-    return res.status(200).json({message: "testing"})
+export const getPostsWall = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userRequesting = req.user as UserWithObjectsIDs;
+  const friendsAndUserPosts: Types.ObjectId[] = [...userRequesting.friends, userRequesting._id]
+  try {
+    const posts = await Post.find({author: {$in: friendsAndUserPosts}})
+    console.log(posts)
+    return res.status(200).json({ success: true, message: "sucesfully fetched posts", posts });
+  } catch (err: Error | any) {
+    next(err);
   }
+};

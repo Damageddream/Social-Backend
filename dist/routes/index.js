@@ -40,7 +40,7 @@ router.post("/posts", passport_1.default.authenticate("jwt", { session: false })
 router.get("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPost);
 router.delete("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.deletePost);
 router.put("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.updatePost);
-router.get("/posts/wall", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPostsWall);
+router.get("/wall", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPostsWall);
 // routes for comments
 router.get("/posts/:postId/comments", passport_1.default.authenticate("jwt", { session: false }), comment_1.getComments);
 router.post("/posts/:postId/comments", passport_1.default.authenticate("jwt", { session: false }), comment_1.postComment);

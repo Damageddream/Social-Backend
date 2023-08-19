@@ -41,3 +41,14 @@ export interface UserModelInterface extends Model<UserDoc> {
 export interface CustomUser extends Express.User {
     _id: Types.ObjectId
 }
+
+export interface UserWithObjectsIDs {
+    name: string;
+    facebook_id?: string;
+    _id: Types.ObjectId;
+    photo?: string;
+    friends: Types.ObjectId[];
+    invites: Types.ObjectId[];
+    invitesSent: Types.ObjectId[];
+    password?: string;
+}
