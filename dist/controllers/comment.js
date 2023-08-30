@@ -25,9 +25,10 @@ exports.getComments = getComments;
 const postComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const text = req.body.text;
+        const user = req.user;
         const comment = comment_model_1.Comment.build({
             text,
-            author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
+            author: user._id,
             timestamp: new Date(),
             likes: [],
             post: new mongoose_1.Types.ObjectId(req.params.postId),

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Comment } from "../models/comment.model";
 import { Types } from "mongoose";
+import { UserWithObjectsIDs } from "../interfaces/userI";
 
 export const getComments = async (
   req: Request,
@@ -21,10 +22,11 @@ export const postComment = async (
   next: NextFunction 
 ) => {
   try {
-    const text = req.body.text;
+    const text= req.body.text;
+    const user = req.user as UserWithObjectsIDs;
     const comment = Comment.build({
       text,
-      author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
+      author: user._id,
       timestamp: new Date(),
       likes: [],
       post: new Types.ObjectId(req.params.postId),
