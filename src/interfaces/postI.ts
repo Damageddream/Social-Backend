@@ -7,6 +7,7 @@ export interface PostI {
     timestamp: Date;
     likes: string[];
     _id?: string;
+    comments: Types.ObjectId[];
 }
 
 export interface PostIwithID {
@@ -16,6 +17,7 @@ export interface PostIwithID {
     timestamp: Date;
     likes: string[];
     _id: string;
+    comments: Types.ObjectId[];
 }
 
 export interface PostDoc extends Document {
@@ -25,6 +27,7 @@ export interface PostDoc extends Document {
     timestamp: Date;
     likes: string[];
     _id: string;
+    comments: Types.ObjectId[];
 }
 
 export interface PostModelInteraface extends Model<PostDoc> {

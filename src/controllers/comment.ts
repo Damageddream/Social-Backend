@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Comment } from "../models/comment.model";
 import { Types } from "mongoose";
 import { UserWithObjectsIDs } from "../interfaces/userI";
+import { Post } from "../models/post.model";
 
 export const getComments = async (
   req: Request,
@@ -19,10 +20,11 @@ export const getComments = async (
 export const postComment = async (
   req: Request,
   res: Response,
-  next: NextFunction 
+  next: NextFunction
 ) => {
   try {
-    const text= req.body.text;
+    const postId = req.body.post;
+    const text = req.body.text;
     const user = req.user as UserWithObjectsIDs;
     const comment = Comment.build({
       text,
@@ -31,8 +33,10 @@ export const postComment = async (
       likes: [],
       post: new Types.ObjectId(req.params.postId),
     });
-    await comment.save();
-    return res.status(201).send(comment);
+    const addedComment = await comment.save();
+    const newCommentId = addedComment._id;
+    await Post.findByIdAndUpdate(postId, { $push: { comments: newCommentId } });
+    return res.status(201).json({ success: true, message: "New comment added" });
   } catch (err: Error | any) {
     next(err);
   }
@@ -63,7 +67,7 @@ export const deleteComment = async (
     } else {
       try {
         await Comment.findByIdAndRemove(comment._id);
-        return res.status(200).json({message :"comment removed"})
+        return res.status(200).json({ message: "comment removed" });
       } catch (err: Error | any) {
         next(err);
       }
@@ -73,30 +77,33 @@ export const deleteComment = async (
   }
 };
 
-export const updateComment = async (req: Request, res: Response, next: NextFunction) => {
-    try{
-        const comment = await Comment.findById(req.params.commentId)
-        if (!comment) {
-            return res.json({ message: "comment does not exists" });
-        } else {
-            try {
-                const text = req.body.text;
-                const commentUpdate = Comment.build({
-                  text,
-                  author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
-                  timestamp: new Date(),
-                  likes: [],
-                  post: new Types.ObjectId(req.params.postId),
-                  _id: comment._id,
-                });
-                await Comment.findByIdAndUpdate(comment._id, commentUpdate, {});
-                return res.status(201).send(commentUpdate);
-              } catch (err: Error | any) {
-                next(err);
-              }
-        }
-
-    } catch (err: Error | any) {
+export const updateComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return res.json({ message: "comment does not exists" });
+    } else {
+      try {
+        const text = req.body.text;
+        const commentUpdate = Comment.build({
+          text,
+          author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
+          timestamp: new Date(),
+          likes: [],
+          post: new Types.ObjectId(req.params.postId),
+          _id: comment._id,
+        });
+        await Comment.findByIdAndUpdate(comment._id, commentUpdate);
+        return res.status(201).send(commentUpdate);
+      } catch (err: Error | any) {
         next(err);
       }
-}
+    }
+  } catch (err: Error | any) {
+    next(err);
+  }
+};

@@ -32,6 +32,7 @@ const postPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             author: user._id,
             timestamp: new Date(),
             likes: [],
+            comments: [],
         });
         yield post.save();
         return res.status(201).send(post);
@@ -87,6 +88,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                     timestamp: new Date(),
                     likes: [],
                     _id: post._id,
+                    comments: [],
                 });
                 yield post_model_1.Post.findByIdAndUpdate(post._id, postUpdate, {});
                 return res.status(201).send(post);

@@ -30,6 +30,7 @@ export const postPost = async (
       author: user._id,
       timestamp: new Date(),
       likes: [],
+      comments: [],
     });
     await post.save();
     return res.status(201).send(post);
@@ -92,6 +93,7 @@ export const updatePost = async (
           timestamp: new Date(),
           likes: [],
           _id: post._id,
+          comments: [],
         });
         await Post.findByIdAndUpdate(post._id, postUpdate, {});
         return res.status(201).send(post);

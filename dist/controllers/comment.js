@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateComment = exports.deleteComment = exports.getComment = exports.postComment = exports.getComments = void 0;
 const comment_model_1 = require("../models/comment.model");
 const mongoose_1 = require("mongoose");
+const post_model_1 = require("../models/post.model");
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const comment = yield comment_model_1.Comment.find({ post: req.params.postId });
@@ -24,6 +25,7 @@ const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 exports.getComments = getComments;
 const postComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const postId = req.body.post;
         const text = req.body.text;
         const user = req.user;
         const comment = comment_model_1.Comment.build({
@@ -33,8 +35,10 @@ const postComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             likes: [],
             post: new mongoose_1.Types.ObjectId(req.params.postId),
         });
-        yield comment.save();
-        return res.status(201).send(comment);
+        const addedComment = yield comment.save();
+        const newCommentId = addedComment._id;
+        yield post_model_1.Post.findByIdAndUpdate(postId, { $push: { comments: newCommentId } });
+        return res.status(201).json({ success: true, message: "New comment added" });
     }
     catch (err) {
         next(err);
@@ -89,7 +93,7 @@ const updateComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                     post: new mongoose_1.Types.ObjectId(req.params.postId),
                     _id: comment._id,
                 });
-                yield comment_model_1.Comment.findByIdAndUpdate(comment._id, commentUpdate, {});
+                yield comment_model_1.Comment.findByIdAndUpdate(comment._id, commentUpdate);
                 return res.status(201).send(commentUpdate);
             }
             catch (err) {
