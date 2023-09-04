@@ -31,7 +31,7 @@ const postSchema = new mongoose_1.Schema({
     author: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     timestamp: { type: Date, required: true },
     likes: { type: Array, required: true },
-    comments: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Comment" }
+    comments: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Comment" }]
 });
 postSchema.statics.build = (attr) => {
     return new Post(attr);

@@ -11,7 +11,6 @@ export const getComments = async (
 ) => {
   try {
     const post = await Post.findById(req.params.postId).populate('comments');
-    console.log(post)
     return res.status(200).json(post);
   } catch (err: Error | any) {
     next(err);

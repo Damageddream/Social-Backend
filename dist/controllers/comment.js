@@ -16,7 +16,6 @@ const post_model_1 = require("../models/post.model");
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post = yield post_model_1.Post.findById(req.params.postId).populate('comments');
-        console.log(post);
         return res.status(200).json(post);
     }
     catch (err) {
