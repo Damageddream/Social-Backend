@@ -8,6 +8,7 @@ import {
   deletePost,
   updatePost,
   getPostsWall,
+  likePost,
 } from "../controllers/posts";
 import {
   getComments,
@@ -59,6 +60,7 @@ router.get("/posts/:id", passport.authenticate("jwt", {session: false}),getPost)
 router.delete("/posts/:id", passport.authenticate("jwt", {session: false}),deletePost);
 router.put("/posts/:id", passport.authenticate("jwt", {session: false}),updatePost);
 router.get("/wall", passport.authenticate("jwt", {session: false}), getPostsWall)
+router.post("/posts/:id/like", passport.authenticate("jwt", {session: false}),likePost)
 
 // routes for comments
 router.get("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),getComments);
@@ -66,6 +68,7 @@ router.post("/posts/:postId/comments", passport.authenticate("jwt", {session: fa
 router.get("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),getComment);
 router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),deleteComment);
 router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),updateComment);
+router.post("/posts/:commentId/like", passport.authenticate("jwt", {session: false}))
 
 //routes for users interactions
 router.get("/users")

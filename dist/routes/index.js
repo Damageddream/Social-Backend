@@ -41,12 +41,14 @@ router.get("/posts/:id", passport_1.default.authenticate("jwt", { session: false
 router.delete("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.deletePost);
 router.put("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.updatePost);
 router.get("/wall", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPostsWall);
+router.post("/posts/:id/like", passport_1.default.authenticate("jwt", { session: false }), posts_1.likePost);
 // routes for comments
 router.get("/posts/:postId/comments", passport_1.default.authenticate("jwt", { session: false }), comment_1.getComments);
 router.post("/posts/:postId/comments", passport_1.default.authenticate("jwt", { session: false }), comment_1.postComment);
 router.get("/posts/:postId/comments/:commentId", passport_1.default.authenticate("jwt", { session: false }), comment_1.getComment);
 router.delete("/posts/:postId/comments/:commentId", passport_1.default.authenticate("jwt", { session: false }), comment_1.deleteComment);
 router.put("/posts/:postId/comments/:commentId", passport_1.default.authenticate("jwt", { session: false }), comment_1.updateComment);
+router.post("/posts/:commentId/like", passport_1.default.authenticate("jwt", { session: false }));
 //routes for users interactions
 router.get("/users");
 router.get("/users/friends", passport_1.default.authenticate("jwt", { session: false }), user_1.getFriends);

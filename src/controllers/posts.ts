@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { Post } from "../models/post.model";
-import  { Types } from "mongoose";
-import {UserWithObjectsIDs } from "../interfaces/userI";
+import mongoose, { Types } from "mongoose";
+import { UserWithObjectsIDs } from "../interfaces/userI";
+import { PostI } from "../interfaces/postI";
 
 export const getPosts = async (
   req: Request,
@@ -21,7 +22,7 @@ export const postPost = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user = req.user as UserWithObjectsIDs
+  const user = req.user as UserWithObjectsIDs;
   try {
     const { title, text } = req.body as { title: string; text: string };
     const post = Post.build({
@@ -112,11 +113,42 @@ export const getPostsWall = async (
   next: NextFunction
 ) => {
   const userRequesting = req.user as UserWithObjectsIDs;
-  const friendsAndUserPosts: Types.ObjectId[] = [...userRequesting.friends, userRequesting._id]
+  const friendsAndUserPosts: Types.ObjectId[] = [
+    ...userRequesting.friends,
+    userRequesting._id,
+  ];
   try {
-    const posts = await Post.find({author: {$in: friendsAndUserPosts}})
-    console.log(posts)
-    return res.status(200).json({ success: true, message: "sucesfully fetched posts", posts });
+    const posts = await Post.find({ author: { $in: friendsAndUserPosts } });
+    console.log(posts);
+    return res
+      .status(200)
+      .json({ success: true, message: "sucesfully fetched posts", posts });
+  } catch (err: Error | any) {
+    next(err);
+  }
+};
+
+export const likePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userRequesting = req.user as UserWithObjectsIDs;
+  const userId = new mongoose.Types.ObjectId(userRequesting._id)
+  const id = req.params.id;
+  try {
+    const post = (await Post.findById(id)) as PostI;
+    if (post.likes.includes(userId)) {
+      return res
+        .status(409)
+        .json({ sucess: false, message: "you already liked this post" });
+    }
+    try {
+      await Post.findByIdAndUpdate(id, { $push: { likes: userId } } )
+      return res.status(200).json({sucess: true, message: "added like"})
+    } catch (err: Error | any) {
+      next(err);
+    }
   } catch (err: Error | any) {
     next(err);
   }

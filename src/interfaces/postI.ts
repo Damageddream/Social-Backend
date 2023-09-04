@@ -5,7 +5,7 @@ export interface PostI {
     text: string;
     author: Types.ObjectId;
     timestamp: Date;
-    likes: string[];
+    likes: Types.ObjectId[];
     _id?: string;
     comments: Types.ObjectId[];
 }
@@ -15,7 +15,7 @@ export interface PostIwithID {
     text: string;
     author: Types.ObjectId;
     timestamp: Date;
-    likes: string[];
+    likes: Types.ObjectId[];
     _id: string;
     comments: Types.ObjectId[];
 }
@@ -25,7 +25,7 @@ export interface PostDoc extends Document {
     text: string;
     author: Types.ObjectId;
     timestamp: Date;
-    likes: string[];
+    likes: Types.ObjectId[];
     _id: string;
     comments: Types.ObjectId[];
 }
