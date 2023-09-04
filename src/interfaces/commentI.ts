@@ -7,7 +7,7 @@ export interface CommentI {
     likes: Types.ObjectId[];
     post: Types.ObjectId;
     _id?: string;
-}
+}   
 
 export interface CommentIwithID {
     text: string;
