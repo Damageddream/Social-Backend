@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { Comment } from "../models/comment.model";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { UserWithObjectsIDs } from "../interfaces/userI";
 import { Post } from "../models/post.model";
+import { CommentI } from "../interfaces/commentI";
+
 
 export const getComments = async (
   req: Request,
@@ -107,3 +109,28 @@ export const updateComment = async (
     next(err);
   }
 };
+
+export const likeComment = async (req: Request, res: Response, next: NextFunction) => {
+  const userRequesting = req.user as UserWithObjectsIDs;
+  const userId = new mongoose.Types.ObjectId(userRequesting._id)
+  const id = req.params.commentId;
+  try {
+    const comment = (await Comment.findById(id)) as CommentI;
+    if (comment.likes.includes(userId)) {
+      try{
+        await Comment.findByIdAndUpdate(id, {$pull: {likes: userId}})
+        return res.status(200).json({sucess: true, message: "removed like"})
+      }catch (err: Error | any) {
+        next(err);
+      }
+    }
+    try {
+      await Comment.findByIdAndUpdate(id, { $push: { likes: userId } } )
+      return res.status(200).json({sucess: true, message: "added like"})
+    } catch (err: Error | any) {
+      next(err);
+    }
+  } catch (err: Error | any) {
+    next(err);
+  }
+}

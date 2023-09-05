@@ -16,6 +16,7 @@ import {
   getComment,
   deleteComment,
   updateComment,
+  likeComment,
 } from "../controllers/comment";
 import multer from "multer";
 const path = require('path');
@@ -65,10 +66,10 @@ router.post("/posts/:id/like", passport.authenticate("jwt", {session: false}),li
 // routes for comments
 router.get("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),getComments);
 router.post("/posts/:postId/comments", passport.authenticate("jwt", {session: false}),postComment);
-router.get("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),getComment);
-router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),deleteComment);
-router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", {session: false}),updateComment);
-router.post("/posts/:commentId/like", passport.authenticate("jwt", {session: false}))
+router.get("/comments/:commentId", passport.authenticate("jwt", {session: false}),getComment);
+router.delete("/comments/:commentId", passport.authenticate("jwt", {session: false}),deleteComment);
+router.put("/comments/:commentId", passport.authenticate("jwt", {session: false}),updateComment);
+router.post("/comments/:commentId/like", passport.authenticate("jwt", {session: false}), likeComment)
 
 //routes for users interactions
 router.get("/users")

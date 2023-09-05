@@ -139,9 +139,12 @@ export const likePost = async (
   try {
     const post = (await Post.findById(id)) as PostI;
     if (post.likes.includes(userId)) {
-      return res
-        .status(409)
-        .json({ sucess: false, message: "you already liked this post" });
+      try{
+        await Post.findByIdAndUpdate(id, {$pull: {likes: userId}})
+        return res.status(200).json({sucess: true, message: "removed like"})
+      }catch (err: Error | any) {
+        next(err);
+      }
     }
     try {
       await Post.findByIdAndUpdate(id, { $push: { likes: userId } } )

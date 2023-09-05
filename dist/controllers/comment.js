@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,9 +32,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateComment = exports.deleteComment = exports.getComment = exports.postComment = exports.getComments = void 0;
+exports.likeComment = exports.updateComment = exports.deleteComment = exports.getComment = exports.postComment = exports.getComments = void 0;
 const comment_model_1 = require("../models/comment.model");
-const mongoose_1 = require("mongoose");
+const mongoose_1 = __importStar(require("mongoose"));
 const post_model_1 = require("../models/post.model");
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -106,4 +129,32 @@ const updateComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.updateComment = updateComment;
+const likeComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userRequesting = req.user;
+    const userId = new mongoose_1.default.Types.ObjectId(userRequesting._id);
+    const id = req.params.commentId;
+    try {
+        const comment = (yield comment_model_1.Comment.findById(id));
+        if (comment.likes.includes(userId)) {
+            try {
+                yield comment_model_1.Comment.findByIdAndUpdate(id, { $pull: { likes: userId } });
+                return res.status(200).json({ sucess: true, message: "removed like" });
+            }
+            catch (err) {
+                next(err);
+            }
+        }
+        try {
+            yield comment_model_1.Comment.findByIdAndUpdate(id, { $push: { likes: userId } });
+            return res.status(200).json({ sucess: true, message: "added like" });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.likeComment = likeComment;
 //# sourceMappingURL=comment.js.map

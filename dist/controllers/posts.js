@@ -151,9 +151,13 @@ const likePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     try {
         const post = (yield post_model_1.Post.findById(id));
         if (post.likes.includes(userId)) {
-            return res
-                .status(409)
-                .json({ sucess: false, message: "you already liked this post" });
+            try {
+                yield post_model_1.Post.findByIdAndUpdate(id, { $pull: { likes: userId } });
+                return res.status(200).json({ sucess: true, message: "removed like" });
+            }
+            catch (err) {
+                next(err);
+            }
         }
         try {
             yield post_model_1.Post.findByIdAndUpdate(id, { $push: { likes: userId } });
