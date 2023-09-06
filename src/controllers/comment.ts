@@ -12,7 +12,7 @@ export const getComments = async (
   next: NextFunction
 ) => {
   try {
-    const post = await Post.findById(req.params.postId).populate('comments');
+    const post = await Post.findById(req.params.postId).populate('comments').populate({path: 'comments', populate:{path:'author', model:"User"}}).populate('author');
     return res.status(200).json(post);
   } catch (err: Error | any) {
     next(err);

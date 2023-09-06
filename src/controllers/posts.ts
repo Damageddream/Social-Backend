@@ -118,7 +118,7 @@ export const getPostsWall = async (
     userRequesting._id,
   ];
   try {
-    const posts = await Post.find({ author: { $in: friendsAndUserPosts } });
+    const posts = await Post.find({ author: { $in: friendsAndUserPosts } }).populate('author');
     console.log(posts);
     return res
       .status(200)
