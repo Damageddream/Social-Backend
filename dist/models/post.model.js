@@ -23,9 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Post = void 0;
+exports.Post = exports.postSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const postSchema = new mongoose_1.Schema({
+exports.postSchema = new mongoose_1.Schema({
     title: { type: String, required: true, maxLength: 100, minLength: 1 },
     text: { type: String, required: true, maxLength: 500, minLength: 1 },
     author: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
@@ -33,9 +33,9 @@ const postSchema = new mongoose_1.Schema({
     likes: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" }],
     comments: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Comment" }]
 });
-postSchema.statics.build = (attr) => {
+exports.postSchema.statics.build = (attr) => {
     return new Post(attr);
 };
-const Post = mongoose_1.default.model("Post", postSchema);
+const Post = mongoose_1.default.model("Post", exports.postSchema);
 exports.Post = Post;
 //# sourceMappingURL=post.model.js.map

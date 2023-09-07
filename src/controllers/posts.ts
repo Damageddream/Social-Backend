@@ -3,6 +3,7 @@ import { Post } from "../models/post.model";
 import mongoose, { Types } from "mongoose";
 import { UserWithObjectsIDs } from "../interfaces/userI";
 import { PostI } from "../interfaces/postI";
+import { Comment } from "../models/comment.model";
 
 export const getPosts = async (
   req: Request,
@@ -59,12 +60,18 @@ export const deletePost = async (
   next: NextFunction
 ) => {
   try {
+    const userRequesting = req.user as UserWithObjectsIDs;
     const post = await Post.findById(req.params.id);
     if (!post) {
       return res.json({ message: "post does not exists" });
     }
+    if(post.author.toString() !== userRequesting._id.toString() ){
+      return res.status(403).json({sucess: false, message: "only author can remove post"})
+    }
     try {
-      await Post.findByIdAndRemove(post._id);
+      const removedPost = Post.findByIdAndRemove(post._id);
+      const removedComments = Comment.deleteMany({post: post._id})
+      await Promise.all([removedComments, removedPost])
       return res.status(200).json({ message: "post removed" });
     } catch (err: Error | any) {
       next(err);
@@ -80,17 +87,21 @@ export const updatePost = async (
   next: NextFunction
 ) => {
   try {
+    const userRequesting = req.user as UserWithObjectsIDs;
     const post = await Post.findById(req.params.id);
     if (!post) {
       return res.json({ message: "post does not exists" });
-    } else {
+    }
+    if(post.author.toString() !== userRequesting._id.toString() ){
+      return res.status(403).json({sucess: false, message: "only author can edit post"})
+    }
       try {
         const { title, text } = req.body as { title: string; text: string };
         // author for testing replace with params or req.author
         const postUpdate = Post.build({
           title,
           text,
-          author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
+          author: userRequesting._id,
           timestamp: new Date(),
           likes: [],
           _id: post._id,
@@ -101,7 +112,7 @@ export const updatePost = async (
       } catch (err: Error | any) {
         next(err);
       }
-    }
+    
   } catch (err: Error | any) {
     next(err);
   }
