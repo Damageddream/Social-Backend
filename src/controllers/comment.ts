@@ -63,17 +63,21 @@ export const deleteComment = async (
   next: NextFunction
 ) => {
   try {
+    const userRequesting = req.user as UserWithObjectsIDs;
     const comment = await Comment.findById(req.params.commentId);
     if (!comment) {
       return res.json({ message: "comment does not exists" });
-    } else {
+    }
+    if(comment.author.toString() !== userRequesting._id.toString() ){
+      return res.status(403).json({sucess: false, message: "only author can remove comment"})
+    }
       try {
         await Comment.findByIdAndRemove(comment._id);
         return res.status(200).json({ message: "comment removed" });
       } catch (err: Error | any) {
         next(err);
       }
-    }
+    
   } catch (err: Error | any) {
     next(err);
   }
@@ -85,18 +89,25 @@ export const updateComment = async (
   next: NextFunction
 ) => {
   try {
+    const userRequesting = req.user as UserWithObjectsIDs;
     const comment = await Comment.findById(req.params.commentId);
     if (!comment) {
       return res.json({ message: "comment does not exists" });
-    } else {
+    } 
+    if(comment.author.toString() !== userRequesting._id.toString() ){
+      return res.status(403).json({sucess: false, message: "only author can edit comment"})
+    }
       try {
         const text = req.body.text;
+        const postId = req.body.post;
+        const likes = req.body.likes as string[];
+        const likesObjectId = likes.map(like=> new mongoose.Types.ObjectId(like))
         const commentUpdate = Comment.build({
           text,
-          author: new Types.ObjectId("64b91a116b03c6637bd49a14"),
+          author: userRequesting._id,
           timestamp: new Date(),
-          likes: [],
-          post: new Types.ObjectId(req.params.postId),
+          likes: likesObjectId,
+          post: postId,
           _id: comment._id,
         });
         await Comment.findByIdAndUpdate(comment._id, commentUpdate);
@@ -104,7 +115,7 @@ export const updateComment = async (
       } catch (err: Error | any) {
         next(err);
       }
-    }
+    
   } catch (err: Error | any) {
     next(err);
   }

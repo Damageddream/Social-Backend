@@ -80,18 +80,20 @@ const getComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.getComment = getComment;
 const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const userRequesting = req.user;
         const comment = yield comment_model_1.Comment.findById(req.params.commentId);
         if (!comment) {
             return res.json({ message: "comment does not exists" });
         }
-        else {
-            try {
-                yield comment_model_1.Comment.findByIdAndRemove(comment._id);
-                return res.status(200).json({ message: "comment removed" });
-            }
-            catch (err) {
-                next(err);
-            }
+        if (comment.author.toString() !== userRequesting._id.toString()) {
+            return res.status(403).json({ sucess: false, message: "only author can remove comment" });
+        }
+        try {
+            yield comment_model_1.Comment.findByIdAndRemove(comment._id);
+            return res.status(200).json({ message: "comment removed" });
+        }
+        catch (err) {
+            next(err);
         }
     }
     catch (err) {
@@ -101,27 +103,32 @@ const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.deleteComment = deleteComment;
 const updateComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const userRequesting = req.user;
         const comment = yield comment_model_1.Comment.findById(req.params.commentId);
         if (!comment) {
             return res.json({ message: "comment does not exists" });
         }
-        else {
-            try {
-                const text = req.body.text;
-                const commentUpdate = comment_model_1.Comment.build({
-                    text,
-                    author: new mongoose_1.Types.ObjectId("64b91a116b03c6637bd49a14"),
-                    timestamp: new Date(),
-                    likes: [],
-                    post: new mongoose_1.Types.ObjectId(req.params.postId),
-                    _id: comment._id,
-                });
-                yield comment_model_1.Comment.findByIdAndUpdate(comment._id, commentUpdate);
-                return res.status(201).send(commentUpdate);
-            }
-            catch (err) {
-                next(err);
-            }
+        if (comment.author.toString() !== userRequesting._id.toString()) {
+            return res.status(403).json({ sucess: false, message: "only author can edit comment" });
+        }
+        try {
+            const text = req.body.text;
+            const postId = req.body.post;
+            const likes = req.body.likes;
+            const likesObjectId = likes.map(like => new mongoose_1.default.Types.ObjectId(like));
+            const commentUpdate = comment_model_1.Comment.build({
+                text,
+                author: userRequesting._id,
+                timestamp: new Date(),
+                likes: likesObjectId,
+                post: postId,
+                _id: comment._id,
+            });
+            yield comment_model_1.Comment.findByIdAndUpdate(comment._id, commentUpdate);
+            return res.status(201).send(commentUpdate);
+        }
+        catch (err) {
+            next(err);
         }
     }
     catch (err) {

@@ -89,6 +89,7 @@ export const updatePost = async (
   try {
     const userRequesting = req.user as UserWithObjectsIDs;
     const post = await Post.findById(req.params.id);
+    
     if (!post) {
       return res.json({ message: "post does not exists" });
     }
@@ -96,18 +97,20 @@ export const updatePost = async (
       return res.status(403).json({sucess: false, message: "only author can edit post"})
     }
       try {
-        const { title, text } = req.body as { title: string; text: string };
+        const { title, text, likes, comments } = req.body as { title: string; text: string; likes: string[], comments: string[] };
+        const likesObjectId = likes.map(like=> new mongoose.Types.ObjectId(like))
+        const commentsObjectId = comments.map(comment=> new mongoose.Types.ObjectId(comment))
         // author for testing replace with params or req.author
         const postUpdate = Post.build({
           title,
           text,
           author: userRequesting._id,
           timestamp: new Date(),
-          likes: [],
+          likes: likesObjectId,
           _id: post._id,
-          comments: [],
+          comments: commentsObjectId,
         });
-        await Post.findByIdAndUpdate(post._id, postUpdate, {});
+        await Post.findByIdAndUpdate(post._id, postUpdate);
         return res.status(201).send(post);
       } catch (err: Error | any) {
         next(err);
