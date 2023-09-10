@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.editUser = exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -288,4 +288,35 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.postLogin = postLogin;
+const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userRequesting = req.user;
+    const name = req.body.name;
+    try {
+        const user = yield user_model_1.User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ sucess: false, message: "user not found" });
+        }
+        if (user._id.toString() !== userRequesting._id.toString()) {
+            return res.status(403).json({ sucess: false, message: "only account owner can edit profile" });
+        }
+        let editedUser;
+        if (req.file) {
+            editedUser = { name, photo: `http://localhost:3000/static/${req.file.filename}` };
+        }
+        else {
+            editedUser = { name };
+        }
+        try {
+            yield user_model_1.User.findByIdAndUpdate(user._id, editedUser);
+            return res.status(201).json({ sucess: true, message: "edited user" });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.editUser = editUser;
 //# sourceMappingURL=user.js.map

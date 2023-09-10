@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
-import { UserIwithID } from "../interfaces/userI";
+import { UserIwithID, UserWithObjectsIDs } from "../interfaces/userI";
 import { CustomUser } from "../interfaces/userI";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
@@ -323,6 +323,40 @@ export const postLogin = async (
       const err = new Error("Problem with password");
       return next(err);
     }
+  } catch (err: Error | any) {
+    next(err);
+  }
+};
+
+export const editUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userRequesting = req.user as UserWithObjectsIDs;
+  const name = req.body.name;
+  try {
+    const user = await User.findById(req.params.id);
+    if(!user) {
+      return res.status(404).json({sucess: false, message: "user not found"})
+    }
+    if(user._id.toString() !== userRequesting._id.toString()){
+      return res.status(403).json({sucess: false, message: "only account owner can edit profile"})
+    }
+    let editedUser;
+    if(req.file){
+      editedUser = {name, photo: `http://localhost:3000/static/${req.file.filename}`}
+    }
+    else{
+      editedUser = {name}
+    }
+    try{
+      await User.findByIdAndUpdate(user._id, editedUser)
+      return res.status(201).json({sucess: true, message: "edited user"})
+    } catch (err: Error | any) {
+      next(err);
+    }
+
   } catch (err: Error | any) {
     next(err);
   }
