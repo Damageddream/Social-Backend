@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editUser = exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.deleteUser = exports.editUser = exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const post_model_1 = require("../models/post.model");
+const comment_model_1 = require("../models/comment.model");
 // sucesfull login response
 const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
@@ -297,11 +299,17 @@ const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             return res.status(404).json({ sucess: false, message: "user not found" });
         }
         if (user._id.toString() !== userRequesting._id.toString()) {
-            return res.status(403).json({ sucess: false, message: "only account owner can edit profile" });
+            return res.status(403).json({
+                sucess: false,
+                message: "only account owner can edit profile",
+            });
         }
         let editedUser;
         if (req.file) {
-            editedUser = { name, photo: `http://localhost:3000/static/${req.file.filename}` };
+            editedUser = {
+                name,
+                photo: `http://localhost:3000/static/${req.file.filename}`,
+            };
         }
         else {
             editedUser = { name };
@@ -319,4 +327,43 @@ const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.editUser = editUser;
+const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const userRequesting = req.user;
+    try {
+        const user = yield user_model_1.User.findById(id);
+        if (!user) {
+            return res.status(404).json({ sucess: false, message: "user not found" });
+        }
+        if (id !== userRequesting._id.toString()) {
+            return res
+                .status(403)
+                .json({ sucess: false, message: "only owner can delete account" });
+        }
+        try {
+            const removedUser = user_model_1.User.findByIdAndRemove(id);
+            const removedPosts = post_model_1.Post.deleteMany({ author: id });
+            const removedComments = comment_model_1.Comment.deleteMany({ author: id });
+            const updatedFriends = user_model_1.User.updateMany({ friends: id }, { $pull: { friends: id } });
+            const updatedInvitesSent = user_model_1.User.updateMany({ invitesSent: id }, { $pull: { invitesSent: id } });
+            const updatedInvites = user_model_1.User.updateMany({ invites: id }, { $pull: { invites: id } });
+            yield Promise.all([
+                removedComments,
+                removedPosts,
+                removedUser,
+                updatedFriends,
+                updatedInvites,
+                updatedInvitesSent,
+            ]);
+            return res.status(200).json({ sucess: true, message: "user removed" });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.deleteUser = deleteUser;
 //# sourceMappingURL=user.js.map

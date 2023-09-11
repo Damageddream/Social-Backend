@@ -61,7 +61,7 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const userRequesting = req.user;
         const post = yield post_model_1.Post.findById(req.params.id);
         if (!post) {
-            return res.json({ message: "post does not exists" });
+            return res.status(404).json({ message: "post does not exists" });
         }
         if (post.author.toString() !== userRequesting._id.toString()) {
             return res.status(403).json({ sucess: false, message: "only author can remove post" });
@@ -70,7 +70,7 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             const removedPost = post_model_1.Post.findByIdAndRemove(post._id);
             const removedComments = comment_model_1.Comment.deleteMany({ post: post._id });
             yield Promise.all([removedComments, removedPost]);
-            return res.status(200).json({ message: "post removed" });
+            return res.status(200).json({ sucess: true, message: "post removed" });
         }
         catch (err) {
             next(err);

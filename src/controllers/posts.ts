@@ -63,7 +63,7 @@ export const deletePost = async (
     const userRequesting = req.user as UserWithObjectsIDs;
     const post = await Post.findById(req.params.id);
     if (!post) {
-      return res.json({ message: "post does not exists" });
+      return res.status(404).json({ message: "post does not exists" });
     }
     if(post.author.toString() !== userRequesting._id.toString() ){
       return res.status(403).json({sucess: false, message: "only author can remove post"})
@@ -72,7 +72,7 @@ export const deletePost = async (
       const removedPost = Post.findByIdAndRemove(post._id);
       const removedComments = Comment.deleteMany({post: post._id})
       await Promise.all([removedComments, removedPost])
-      return res.status(200).json({ message: "post removed" });
+      return res.status(200).json({sucess:true, message: "post removed" });
     } catch (err: Error | any) {
       next(err);
     }

@@ -5,6 +5,8 @@ import { UserIwithID, UserWithObjectsIDs } from "../interfaces/userI";
 import { CustomUser } from "../interfaces/userI";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { Post } from "../models/post.model";
+import { Comment } from "../models/comment.model";
 
 // sucesfull login response
 export const getSucess = async (
@@ -337,26 +339,80 @@ export const editUser = async (
   const name = req.body.name;
   try {
     const user = await User.findById(req.params.id);
-    if(!user) {
-      return res.status(404).json({sucess: false, message: "user not found"})
+    if (!user) {
+      return res.status(404).json({ sucess: false, message: "user not found" });
     }
-    if(user._id.toString() !== userRequesting._id.toString()){
-      return res.status(403).json({sucess: false, message: "only account owner can edit profile"})
+    if (user._id.toString() !== userRequesting._id.toString()) {
+      return res.status(403).json({
+        sucess: false,
+        message: "only account owner can edit profile",
+      });
     }
     let editedUser;
-    if(req.file){
-      editedUser = {name, photo: `http://localhost:3000/static/${req.file.filename}`}
+    if (req.file) {
+      editedUser = {
+        name,
+        photo: `http://localhost:3000/static/${req.file.filename}`,
+      };
+    } else {
+      editedUser = { name };
     }
-    else{
-      editedUser = {name}
-    }
-    try{
-      await User.findByIdAndUpdate(user._id, editedUser)
-      return res.status(201).json({sucess: true, message: "edited user"})
+    try {
+      await User.findByIdAndUpdate(user._id, editedUser);
+      return res.status(201).json({ sucess: true, message: "edited user" });
     } catch (err: Error | any) {
       next(err);
     }
+  } catch (err: Error | any) {
+    next(err);
+  }
+};
 
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const id = req.params.id;
+  const userRequesting = req.user as UserWithObjectsIDs;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ sucess: false, message: "user not found" });
+    }
+    if (id !== userRequesting._id.toString()) {
+      return res
+        .status(403)
+        .json({ sucess: false, message: "only owner can delete account" });
+    }
+    try {
+      const removedUser = User.findByIdAndRemove(id);
+      const removedPosts = Post.deleteMany({ author: id });
+      const removedComments = Comment.deleteMany({ author: id });
+      const updatedFriends = User.updateMany(
+        { friends: id },
+        { $pull: { friends: id } }
+      );
+      const updatedInvitesSent = User.updateMany(
+        { invitesSent: id },
+        { $pull: { invitesSent: id } }
+      );
+      const updatedInvites = User.updateMany(
+        { invites: id },
+        { $pull: { invites: id } }
+      );
+      await Promise.all([
+        removedComments,
+        removedPosts,
+        removedUser,
+        updatedFriends,
+        updatedInvites,
+        updatedInvitesSent,
+      ]);
+      return res.status(200).json({sucess:true,message: "user removed"})
+    } catch (err: Error | any) {
+      next(err);
+    }
   } catch (err: Error | any) {
     next(err);
   }

@@ -59,5 +59,6 @@ router.post("/users/invites", passport_1.default.authenticate("jwt", { session: 
 router.post("/users/register", upload.single("file"), user_1.postRegister);
 router.post("/users/login", user_1.postLogin);
 router.put("/user/edit/:id", passport_1.default.authenticate("jwt", { session: false }), upload.single("file"), user_1.editUser);
+router.delete("/user/delete/:id", passport_1.default.authenticate("jwt", { session: false }), user_1.deleteUser);
 exports.default = router;
 //# sourceMappingURL=index.js.map
