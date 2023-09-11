@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { Post } from "../models/post.model";
 import { Comment } from "../models/comment.model";
+import fs from 'fs';
+const path = require('path');
 
 // sucesfull login response
 export const getSucess = async (
@@ -386,6 +388,10 @@ export const deleteUser = async (
         .json({ sucess: false, message: "only owner can delete account" });
     }
     try {
+      if(user.photo) {
+        const photoPath = path.join(__dirname, '../public', user.photo);
+        fs.unlinkSync(photoPath);
+      }
       const removedUser = User.findByIdAndRemove(id);
       const removedPosts = Post.deleteMany({ author: id });
       const removedComments = Comment.deleteMany({ author: id });
@@ -417,3 +423,12 @@ export const deleteUser = async (
     next(err);
   }
 };
+
+export const postLogout = (req: Request, res: Response, next: NextFunction) => {
+  req.logout((err)=>{
+    if(err){
+      next(err)
+    }
+    return res.status(200).json({sucess: true, message: "user logout"})
+  })
+}

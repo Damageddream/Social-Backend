@@ -12,13 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.editUser = exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
+exports.postLogout = exports.deleteUser = exports.editUser = exports.postLogin = exports.postRegister = exports.postInvites = exports.getInvites = exports.postInvite = exports.getNoFriends = exports.getFriends = exports.getUsers = exports.getLogout = exports.getFailure = exports.getSucess = void 0;
 const user_model_1 = require("../models/user.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const post_model_1 = require("../models/post.model");
 const comment_model_1 = require("../models/comment.model");
+const fs_1 = __importDefault(require("fs"));
+const path = require('path');
 // sucesfull login response
 const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
@@ -341,6 +343,10 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 .json({ sucess: false, message: "only owner can delete account" });
         }
         try {
+            if (user.photo) {
+                const photoPath = path.join(__dirname, '../public', user.photo);
+                fs_1.default.unlinkSync(photoPath);
+            }
             const removedUser = user_model_1.User.findByIdAndRemove(id);
             const removedPosts = post_model_1.Post.deleteMany({ author: id });
             const removedComments = comment_model_1.Comment.deleteMany({ author: id });
@@ -366,4 +372,13 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.deleteUser = deleteUser;
+const postLogout = (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            next(err);
+        }
+        return res.status(200).json({ sucess: true, message: "user logout" });
+    });
+};
+exports.postLogout = postLogout;
 //# sourceMappingURL=user.js.map

@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister, postLogin, getFriends, editUser, deleteUser} from "../controllers/user";
+import { getSucess, getFailure, getNoFriends, postInvite, getInvites, postInvites, postRegister, postLogin, getFriends, editUser, deleteUser, postLogout} from "../controllers/user";
 import {
   getPosts,
   postPost,
@@ -80,6 +80,7 @@ router.get("/users/invites", passport.authenticate("jwt", {session: false}), get
 router.post("/users/invites", passport.authenticate("jwt", {session: false}), postInvites)
 router.post("/users/register", upload.single("file"),postRegister)
 router.post("/users/login", postLogin)
+router.post("/users/logout",passport.authenticate("jwt",{session: false}), postLogout)
 router.put("/user/edit/:id", passport.authenticate("jwt",{session: false}), upload.single("file"), editUser)
 router.delete("/user/delete/:id",passport.authenticate("jwt",{session: false}),deleteUser )
 export default router;
