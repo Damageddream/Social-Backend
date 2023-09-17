@@ -133,7 +133,6 @@ export const getPostsWall = async (
   ];
   try {
     const posts = await Post.find({ author: { $in: friendsAndUserPosts } }).populate('author');
-    console.log(posts);
     return res
       .status(200)
       .json({ success: true, message: "sucesfully fetched posts", posts });

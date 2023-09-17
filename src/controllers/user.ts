@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { Post } from "../models/post.model";
 import { Comment } from "../models/comment.model";
-import fs from 'fs';
-const path = require('path');
+import fs from "fs";
+const path = require("path");
 
 // sucesfull login response
 export const getSucess = async (
@@ -216,20 +216,20 @@ export const postInvites = async (
     if (answer === "accept") {
       updatedUserRequesting = {
         $push: { friends: objectId },
-        $pull: { invites: objectId },
+        $pull: { invites: id },
       };
       updatedUserTargeted = {
         $push: { friends: userRequesting._id },
         $pull: { invitesSent: userRequesting._id },
       };
     } else if (answer === "denie") {
-      updatedUserRequesting = { $pull: { invites: objectId } };
+      updatedUserRequesting = { $pull: { invites: id } };
       updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
     }
-    if (userAnswering?.invitesSent.includes(objectId)) {
+    if (userAnswering?.invitesSent.includes(id)) {
       updatedUserRequesting = {
         ...updatedUserRequesting,
-        $pull: { invitesSent: objectId },
+        $pull: { invitesSent: id },
       };
     }
     if (userTargeted?.invites.includes(userRequesting._id)) {
@@ -242,13 +242,11 @@ export const postInvites = async (
     try {
       const updatedUser = User.findByIdAndUpdate(
         userRequesting._id,
-        updatedUserRequesting,
-        {}
+        updatedUserRequesting
       );
       const updatedFriend = User.findByIdAndUpdate(
-        objectId,
-        updatedUserTargeted,
-        {}
+        id,
+        updatedUserTargeted
       );
       await Promise.all([updatedUser, updatedFriend]);
     } catch (err: Error | any) {
@@ -388,8 +386,8 @@ export const deleteUser = async (
         .json({ sucess: false, message: "only owner can delete account" });
     }
     try {
-      if(user.photo) {
-        const photoPath = path.join(__dirname, '../public', user.photo);
+      if (user.photo) {
+        const photoPath = path.join(__dirname, "../public", user.photo);
         fs.unlinkSync(photoPath);
       }
       const removedUser = User.findByIdAndRemove(id);
@@ -415,7 +413,7 @@ export const deleteUser = async (
         updatedInvites,
         updatedInvitesSent,
       ]);
-      return res.status(200).json({sucess:true,message: "user removed"})
+      return res.status(200).json({ sucess: true, message: "user removed" });
     } catch (err: Error | any) {
       next(err);
     }
@@ -425,10 +423,10 @@ export const deleteUser = async (
 };
 
 export const postLogout = (req: Request, res: Response, next: NextFunction) => {
-  req.logout((err)=>{
-    if(err){
-      next(err)
+  req.logout((err) => {
+    if (err) {
+      next(err);
     }
-    return res.status(200).json({sucess: true, message: "user logout"})
-  })
-}
+    return res.status(200).json({ sucess: true, message: "user logout" });
+  });
+};

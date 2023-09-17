@@ -125,7 +125,6 @@ const getPostsWall = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     ];
     try {
         const posts = yield post_model_1.Post.find({ author: { $in: friendsAndUserPosts } }).populate('author');
-        console.log(posts);
         return res
             .status(200)
             .json({ success: true, message: "sucesfully fetched posts", posts });

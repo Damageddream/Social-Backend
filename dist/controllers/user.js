@@ -20,7 +20,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const post_model_1 = require("../models/post.model");
 const comment_model_1 = require("../models/comment.model");
 const fs_1 = __importDefault(require("fs"));
-const path = require('path');
+const path = require("path");
 // sucesfull login response
 const getSucess = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user) {
@@ -192,7 +192,7 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         if (answer === "accept") {
             updatedUserRequesting = {
                 $push: { friends: objectId },
-                $pull: { invites: objectId },
+                $pull: { invites: id },
             };
             updatedUserTargeted = {
                 $push: { friends: userRequesting._id },
@@ -200,18 +200,18 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             };
         }
         else if (answer === "denie") {
-            updatedUserRequesting = { $pull: { invites: objectId } };
+            updatedUserRequesting = { $pull: { invites: id } };
             updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
         }
-        if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.invitesSent.includes(objectId)) {
-            updatedUserRequesting = Object.assign(Object.assign({}, updatedUserRequesting), { $pull: { invitesSent: objectId } });
+        if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.invitesSent.includes(id)) {
+            updatedUserRequesting = Object.assign(Object.assign({}, updatedUserRequesting), { $pull: { invitesSent: id } });
         }
         if (userTargeted === null || userTargeted === void 0 ? void 0 : userTargeted.invites.includes(userRequesting._id)) {
             updatedUserTargeted = Object.assign(Object.assign({}, updatedUserTargeted), { $pull: { invites: userRequesting._id } });
         }
         try {
-            const updatedUser = user_model_1.User.findByIdAndUpdate(userRequesting._id, updatedUserRequesting, {});
-            const updatedFriend = user_model_1.User.findByIdAndUpdate(objectId, updatedUserTargeted, {});
+            const updatedUser = user_model_1.User.findByIdAndUpdate(userRequesting._id, updatedUserRequesting);
+            const updatedFriend = user_model_1.User.findByIdAndUpdate(id, updatedUserTargeted);
             yield Promise.all([updatedUser, updatedFriend]);
         }
         catch (err) {
@@ -344,7 +344,7 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         }
         try {
             if (user.photo) {
-                const photoPath = path.join(__dirname, '../public', user.photo);
+                const photoPath = path.join(__dirname, "../public", user.photo);
                 fs_1.default.unlinkSync(photoPath);
             }
             const removedUser = user_model_1.User.findByIdAndRemove(id);
