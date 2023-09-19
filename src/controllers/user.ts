@@ -301,7 +301,12 @@ export const postLogin = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username, password } = req.body;
+  const username = req.body.username
+  let password = req.body.password
+  //const { username, password } = req.body;
+  if(username === "Guest"){
+    password = "guest987"
+  }
   try {
     const user = await User.findOne({ name: username });
     if (!user) {
@@ -337,6 +342,9 @@ export const editUser = async (
 ) => {
   const userRequesting = req.user as UserWithObjectsIDs;
   const name = req.body.name;
+  if(userRequesting.name === "Guest"){
+    return res.status(403).json({sucesss: false, message: "You cannot edit Guest profile"})
+  }
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -375,6 +383,9 @@ export const deleteUser = async (
 ) => {
   const id = req.params.id;
   const userRequesting = req.user as UserWithObjectsIDs;
+  if(userRequesting.name === "Guest"){
+    return res.status(403).json({sucesss: false, message: "You cannot delete Guest profile"})
+  }
   try {
     const user = await User.findById(id);
     if (!user) {

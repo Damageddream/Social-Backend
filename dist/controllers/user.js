@@ -260,7 +260,12 @@ const postRegister = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.postRegister = postRegister;
 const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, password } = req.body;
+    const username = req.body.username;
+    let password = req.body.password;
+    //const { username, password } = req.body;
+    if (username === "Guest") {
+        password = "guest987";
+    }
     try {
         const user = yield user_model_1.User.findOne({ name: username });
         if (!user) {
@@ -295,6 +300,9 @@ exports.postLogin = postLogin;
 const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userRequesting = req.user;
     const name = req.body.name;
+    if (userRequesting.name === "Guest") {
+        return res.status(403).json({ sucesss: false, message: "You cannot edit Guest profile" });
+    }
     try {
         const user = yield user_model_1.User.findById(req.params.id);
         if (!user) {
@@ -332,6 +340,9 @@ exports.editUser = editUser;
 const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const userRequesting = req.user;
+    if (userRequesting.name === "Guest") {
+        return res.status(403).json({ sucesss: false, message: "You cannot delete Guest profile" });
+    }
     try {
         const user = yield user_model_1.User.findById(id);
         if (!user) {
