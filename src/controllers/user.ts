@@ -397,7 +397,7 @@ export const deleteUser = async (
         .json({ sucess: false, message: "only owner can delete account" });
     }
     try {
-      if (user.photo) {
+      if (user.photo && !user.facebook_id) {
         const photoPath = path.join(__dirname, "../public", user.photo);
         fs.unlinkSync(photoPath);
       }

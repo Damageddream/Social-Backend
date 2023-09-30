@@ -354,7 +354,7 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 .json({ sucess: false, message: "only owner can delete account" });
         }
         try {
-            if (user.photo) {
+            if (user.photo && !user.facebook_id) {
                 const photoPath = path.join(__dirname, "../public", user.photo);
                 fs_1.default.unlinkSync(photoPath);
             }
