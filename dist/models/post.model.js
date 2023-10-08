@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Post = exports.postSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 exports.postSchema = new mongoose_1.Schema({
-    title: { type: String, required: true, maxLength: 100, minLength: 1 },
     text: { type: String, required: true, maxLength: 500, minLength: 1 },
     author: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     timestamp: { type: Date, required: true },

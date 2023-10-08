@@ -25,9 +25,8 @@ export const postPost = async (
 ) => {
   const user = req.user as UserWithObjectsIDs;
   try {
-    const { title, text } = req.body as { title: string; text: string };
+    const { text } = req.body as {text: string };
     const post = Post.build({
-      title,
       text,
       author: user._id,
       timestamp: new Date(),
@@ -97,12 +96,11 @@ export const updatePost = async (
       return res.status(403).json({sucess: false, message: "only author can edit post"})
     }
       try {
-        const { title, text, likes, comments } = req.body as { title: string; text: string; likes: string[], comments: string[] };
+        const {text, likes, comments } = req.body as { text: string; likes: string[], comments: string[] };
         const likesObjectId = likes.map(like=> new mongoose.Types.ObjectId(like))
         const commentsObjectId = comments.map(comment=> new mongoose.Types.ObjectId(comment))
         // author for testing replace with params or req.author
         const postUpdate = Post.build({
-          title,
           text,
           author: userRequesting._id,
           timestamp: new Date(),

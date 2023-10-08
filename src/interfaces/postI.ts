@@ -1,7 +1,6 @@
 import mongoose, {Document, Model, Types } from "mongoose";
 
 export interface PostI {
-    title: string;
     text: string;
     author: Types.ObjectId;
     timestamp: Date;
@@ -11,7 +10,6 @@ export interface PostI {
 }
 
 export interface PostIwithID {
-    title: string;
     text: string;
     author: Types.ObjectId;
     timestamp: Date;
@@ -21,7 +19,6 @@ export interface PostIwithID {
 }
 
 export interface PostDoc extends Document {
-    title: string;
     text: string;
     author: Types.ObjectId;
     timestamp: Date;

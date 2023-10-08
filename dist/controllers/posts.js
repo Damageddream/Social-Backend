@@ -29,9 +29,8 @@ exports.getPosts = getPosts;
 const postPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     try {
-        const { title, text } = req.body;
+        const { text } = req.body;
         const post = post_model_1.Post.build({
-            title,
             text,
             author: user._id,
             timestamp: new Date(),
@@ -92,12 +91,11 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             return res.status(403).json({ sucess: false, message: "only author can edit post" });
         }
         try {
-            const { title, text, likes, comments } = req.body;
+            const { text, likes, comments } = req.body;
             const likesObjectId = likes.map(like => new mongoose_1.default.Types.ObjectId(like));
             const commentsObjectId = comments.map(comment => new mongoose_1.default.Types.ObjectId(comment));
             // author for testing replace with params or req.author
             const postUpdate = post_model_1.Post.build({
-                title,
                 text,
                 author: userRequesting._id,
                 timestamp: new Date(),
