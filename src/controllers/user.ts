@@ -200,7 +200,7 @@ export const postInvites = async (
       User.findById(userRequesting._id),
       User.findById(id),
     ]);
-
+    console.log(id, userRequesting._id)
     // check if users are not already friends and return if they are
     if (userAnswering?.friends.includes(objectId)) {
       return res.status(409).json({ message: "you already are friends" });
@@ -216,20 +216,20 @@ export const postInvites = async (
     if (answer === "accept") {
       updatedUserRequesting = {
         $push: { friends: objectId },
-        $pull: { invites: id },
+        $pull: { invites: objectId },
       };
       updatedUserTargeted = {
         $push: { friends: userRequesting._id },
         $pull: { invitesSent: userRequesting._id },
       };
     } else if (answer === "denie") {
-      updatedUserRequesting = { $pull: { invites: id } };
+      updatedUserRequesting = { $pull: { invites: objectId } };
       updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
     }
     if (userAnswering?.invitesSent.includes(id)) {
       updatedUserRequesting = {
         ...updatedUserRequesting,
-        $pull: { invitesSent: id },
+        $pull: { invitesSent: objectId },
       };
     }
     if (userTargeted?.invites.includes(userRequesting._id)) {

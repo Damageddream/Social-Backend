@@ -179,6 +179,7 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             user_model_1.User.findById(userRequesting._id),
             user_model_1.User.findById(id),
         ]);
+        console.log(id, userRequesting._id);
         // check if users are not already friends and return if they are
         if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.friends.includes(objectId)) {
             return res.status(409).json({ message: "you already are friends" });
@@ -192,7 +193,7 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         if (answer === "accept") {
             updatedUserRequesting = {
                 $push: { friends: objectId },
-                $pull: { invites: id },
+                $pull: { invites: objectId },
             };
             updatedUserTargeted = {
                 $push: { friends: userRequesting._id },
@@ -200,11 +201,11 @@ const postInvites = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             };
         }
         else if (answer === "denie") {
-            updatedUserRequesting = { $pull: { invites: id } };
+            updatedUserRequesting = { $pull: { invites: objectId } };
             updatedUserTargeted = { $pull: { invitesSent: userRequesting._id } };
         }
         if (userAnswering === null || userAnswering === void 0 ? void 0 : userAnswering.invitesSent.includes(id)) {
-            updatedUserRequesting = Object.assign(Object.assign({}, updatedUserRequesting), { $pull: { invitesSent: id } });
+            updatedUserRequesting = Object.assign(Object.assign({}, updatedUserRequesting), { $pull: { invitesSent: objectId } });
         }
         if (userTargeted === null || userTargeted === void 0 ? void 0 : userTargeted.invites.includes(userRequesting._id)) {
             updatedUserTargeted = Object.assign(Object.assign({}, updatedUserTargeted), { $pull: { invites: userRequesting._id } });
