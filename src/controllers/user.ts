@@ -342,11 +342,14 @@ export const editUser = async (
 ) => {
   const userRequesting = req.user as UserWithObjectsIDs;
   const name = req.body.name;
+  
   if(userRequesting.name === "Guest"){
     return res.status(403).json({sucesss: false, message: "You cannot edit Guest profile"})
   }
   try {
     const user = await User.findById(req.params.id);
+    const secret = process.env.SECRET as string;
+    const token = jwt.sign({ user }, secret);
     if (!user) {
       return res.status(404).json({ sucess: false, message: "user not found" });
     }
@@ -361,13 +364,14 @@ export const editUser = async (
       editedUser = {
         name,
         photo: `http://localhost:3000/static/${req.file.filename}`,
+
       };
     } else {
       editedUser = { name };
     }
     try {
       await User.findByIdAndUpdate(user._id, editedUser);
-      return res.status(201).json({ sucess: true, message: "edited user" });
+      return res.status(201).json({ sucess: true, message: "edited user"});
     } catch (err: Error | any) {
       next(err);
     }
@@ -383,11 +387,14 @@ export const deleteUser = async (
 ) => {
   const id = req.params.id;
   const userRequesting = req.user as UserWithObjectsIDs;
+  
   if(userRequesting.name === "Guest"){
     return res.status(403).json({sucesss: false, message: "You cannot delete Guest profile"})
   }
   try {
     const user = await User.findById(id);
+    console.log(user?.photo?.toString().slice(-8))
+
     if (!user) {
       return res.status(404).json({ sucess: false, message: "user not found" });
     }
@@ -396,8 +403,10 @@ export const deleteUser = async (
         .status(403)
         .json({ sucess: false, message: "only owner can delete account" });
     }
-    try {
-      if (user.photo && !user.facebook_id) {
+    try { 
+      
+
+      if (user.photo && !user.facebook_id && user.photo.toString().slice(-8) !== 'user.png') {
         const photoPath = path.join(__dirname, "../public", user.photo);
         fs.unlinkSync(photoPath);
       }

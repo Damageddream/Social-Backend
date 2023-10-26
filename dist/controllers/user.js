@@ -306,6 +306,8 @@ const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
     try {
         const user = yield user_model_1.User.findById(req.params.id);
+        const secret = process.env.SECRET;
+        const token = jsonwebtoken_1.default.sign({ user }, secret);
         if (!user) {
             return res.status(404).json({ sucess: false, message: "user not found" });
         }
@@ -339,6 +341,7 @@ const editUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.editUser = editUser;
 const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const id = req.params.id;
     const userRequesting = req.user;
     if (userRequesting.name === "Guest") {
@@ -346,6 +349,7 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
     try {
         const user = yield user_model_1.User.findById(id);
+        console.log((_a = user === null || user === void 0 ? void 0 : user.photo) === null || _a === void 0 ? void 0 : _a.toString().slice(-8));
         if (!user) {
             return res.status(404).json({ sucess: false, message: "user not found" });
         }
@@ -355,7 +359,7 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 .json({ sucess: false, message: "only owner can delete account" });
         }
         try {
-            if (user.photo && !user.facebook_id) {
+            if (user.photo && !user.facebook_id && user.photo.toString().slice(-8) !== 'user.png') {
                 const photoPath = path.join(__dirname, "../public", user.photo);
                 fs_1.default.unlinkSync(photoPath);
             }
