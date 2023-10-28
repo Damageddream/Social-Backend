@@ -26,13 +26,19 @@ export const postPost = async (
   const user = req.user as UserWithObjectsIDs;
   try {
     const { text } = req.body as {text: string };
-    const post = Post.build({
+    const postSchema: PostI = {
       text,
       author: user._id,
       timestamp: new Date(),
       likes: [],
       comments: [],
-    });
+    }
+    if(req.file){
+      postSchema.photo = `http://localhost:3000/static/${req.file.filename}`
+    }
+    const post = Post.build(
+      postSchema
+    );
     await post.save();
     return res.status(201).send(post);
   } catch (err: Error | any) {
@@ -96,19 +102,17 @@ export const updatePost = async (
       return res.status(403).json({sucess: false, message: "only author can edit post"})
     }
       try {
-        const {text, likes, comments } = req.body as { text: string; likes: string[], comments: string[] };
-        const likesObjectId = likes.map(like=> new mongoose.Types.ObjectId(like))
-        const commentsObjectId = comments.map(comment=> new mongoose.Types.ObjectId(comment))
+        const {text } = req.body as { text: string; };
+        // const likesObjectId = likes.map(like=> new mongoose.Types.ObjectId(like))
+        // const commentsObjectId = comments.map(comment=> new mongoose.Types.ObjectId(comment))
+        const updatedPost: {text: string, photo?:string} = {
+          text
+        }
+        if(req.file){
+          updatedPost.photo = `http://localhost:3000/static/${req.file.filename}`
+        }
         // author for testing replace with params or req.author
-        const postUpdate = Post.build({
-          text,
-          author: userRequesting._id,
-          timestamp: new Date(),
-          likes: likesObjectId,
-          _id: post._id,
-          comments: commentsObjectId,
-        });
-        await Post.findByIdAndUpdate(post._id, postUpdate);
+        await Post.findByIdAndUpdate(post._id, updatedPost);
         return res.status(201).send(post);
       } catch (err: Error | any) {
         next(err);

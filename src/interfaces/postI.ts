@@ -7,6 +7,7 @@ export interface PostI {
     likes: Types.ObjectId[];
     _id?: string;
     comments: Types.ObjectId[];
+    photo?: string;
 }
 
 export interface PostIwithID {
@@ -16,6 +17,7 @@ export interface PostIwithID {
     likes: Types.ObjectId[];
     _id: string;
     comments: Types.ObjectId[];
+    photo?: string;
 }
 
 export interface PostDoc extends Document {
@@ -25,6 +27,7 @@ export interface PostDoc extends Document {
     likes: Types.ObjectId[];
     _id: string;
     comments: Types.ObjectId[];
+    photo?: string;
 }
 
 export interface PostModelInteraface extends Model<PostDoc> {

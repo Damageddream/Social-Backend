@@ -36,10 +36,10 @@ router.get("/sucess", user_1.getSucess);
 router.get("/login/failed", user_1.getFailure);
 //routes for posts
 router.get("/posts", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPosts);
-router.post("/posts", passport_1.default.authenticate("jwt", { session: false }), posts_1.postPost);
+router.post("/posts", passport_1.default.authenticate("jwt", { session: false }), upload.single("file"), posts_1.postPost);
 router.get("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPost);
 router.delete("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.deletePost);
-router.put("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), posts_1.updatePost);
+router.put("/posts/:id", passport_1.default.authenticate("jwt", { session: false }), upload.single("file"), posts_1.updatePost);
 router.get("/wall", passport_1.default.authenticate("jwt", { session: false }), posts_1.getPostsWall);
 router.post("/posts/:id/like", passport_1.default.authenticate("jwt", { session: false }), posts_1.likePost);
 // routes for comments

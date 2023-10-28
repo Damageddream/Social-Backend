@@ -130,10 +130,6 @@ export const postInvite = async (
     const userRequesting = req.user as CustomUser;
     const { id } = req.body;
     const objectId = new mongoose.Types.ObjectId(id);
-    // const [user, friend] = await Promise.all([
-    //   await User.findById(userRequesting._id.toString()),
-    //   await User.findById(id)
-    // ])
     const user = await User.findById(userRequesting._id.toString());
 
     if (user?.friends.includes(objectId)) {

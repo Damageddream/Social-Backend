@@ -123,10 +123,6 @@ const postInvite = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const userRequesting = req.user;
         const { id } = req.body;
         const objectId = new mongoose_1.default.Types.ObjectId(id);
-        // const [user, friend] = await Promise.all([
-        //   await User.findById(userRequesting._id.toString()),
-        //   await User.findById(id)
-        // ])
         const user = yield user_model_1.User.findById(userRequesting._id.toString());
         if (user === null || user === void 0 ? void 0 : user.friends.includes(objectId)) {
             return res.status(409).json({ message: "you are already friends" });

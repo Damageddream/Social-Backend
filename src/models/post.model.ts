@@ -7,7 +7,8 @@ export const postSchema = new Schema({
   author: { type: Schema.Types.ObjectId, required: true, ref: "User" },
   timestamp: { type: Date, required: true },
   likes: [{ type: Schema.Types.ObjectId, required: true, ref: "User" }],
-  comments: [{type: Schema.Types.ObjectId, required: true, ref: "Comment"}]
+  comments: [{type: Schema.Types.ObjectId, required: true, ref: "Comment"}],
+  photo: {type: String},
   
 });
 

@@ -56,10 +56,10 @@ router.get("/login/failed", getFailure);
 
 //routes for posts
 router.get("/posts", passport.authenticate("jwt", {session: false}), getPosts);
-router.post("/posts",passport.authenticate("jwt", {session: false}), postPost);
+router.post("/posts",passport.authenticate("jwt", {session: false}),upload.single("file"), postPost);
 router.get("/posts/:id", passport.authenticate("jwt", {session: false}),getPost);
 router.delete("/posts/:id", passport.authenticate("jwt", {session: false}),deletePost);
-router.put("/posts/:id", passport.authenticate("jwt", {session: false}),updatePost);
+router.put("/posts/:id", passport.authenticate("jwt", {session: false}),upload.single("file"),updatePost);
 router.get("/wall", passport.authenticate("jwt", {session: false}), getPostsWall)
 router.post("/posts/:id/like", passport.authenticate("jwt", {session: false}),likePost)
 

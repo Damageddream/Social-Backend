@@ -30,7 +30,8 @@ exports.postSchema = new mongoose_1.Schema({
     author: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     timestamp: { type: Date, required: true },
     likes: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" }],
-    comments: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Comment" }]
+    comments: [{ type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Comment" }],
+    photo: { type: String },
 });
 exports.postSchema.statics.build = (attr) => {
     return new Post(attr);
