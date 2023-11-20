@@ -73,7 +73,7 @@ export const deleteComment = async (
     }
       try {
         await Comment.findByIdAndRemove(comment._id);
-        return res.status(200).json({ message: "comment removed" });
+        return res.status(200).json({sucess:true, message: "comment removed" });
       } catch (err: Error | any) {
         next(err);
       }
