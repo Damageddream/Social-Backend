@@ -90,7 +90,7 @@ const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         }
         try {
             yield comment_model_1.Comment.findByIdAndRemove(comment._id);
-            return res.status(200).json({ message: "comment removed" });
+            return res.status(200).json({ sucess: true, message: "comment removed" });
         }
         catch (err) {
             next(err);
