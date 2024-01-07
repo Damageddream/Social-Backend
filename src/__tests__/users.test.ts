@@ -4,7 +4,6 @@ import { connectDB, dropDB } from "../utils/mongoConfigTesting";
 import { describe } from "node:test";
 import { User } from "../models/user.model";
 import dotenv from "dotenv";
-import jwt from 'jsonwebtoken';
 import passport = require("passport");
 import {
     Strategy as JWTStrategy,
@@ -95,6 +94,15 @@ describe("user controller tests", () => {
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('friends');
+      }),
+      it("get users who are not friends of test user",  async () => {
+        const response = await request(app)
+          .get('/users/nofriends')
+          .set('Authorization', `Bearer ${token}`);
+    
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body).toHaveProperty('noFriends');
       });
 
 });
