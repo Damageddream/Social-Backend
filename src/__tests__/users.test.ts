@@ -49,8 +49,20 @@ const request = require('supertest');
 
 describe("user controller tests", () => {
     let token: string;
+    let testUserID: string;
+    let testUser2ID: string;
     beforeAll(async () => {
         await connectDB();
+        const user = User.build({
+          name: "testUser1",
+          password: "testpassword1",
+          photo: "http://localhost:3000/static/user.png",
+          friends: [],
+          invites: [],
+          invitesSent: [],
+        });
+        testUserID = user._id.toString()
+        await user.save();
     });
 
     afterAll(async () => {
@@ -76,6 +88,8 @@ describe("user controller tests", () => {
         const response = await request(app)
           .post('/users/login')
           .send({ username: 'TestUser', password: 'TestPassword' });
+          const user = await User.findOne({ name: 'TestUser' });
+          testUser2ID = user?._id.toString() || "";
     
         expect(response.status).toBe(200);
         expect(response.body.status).toBe('success');
@@ -88,10 +102,6 @@ describe("user controller tests", () => {
         const response = await request(app)
           .get('/users/friends') 
           .set('Authorization', `Bearer ${token}`);
-          if (response.status !== 200) {
-            console.log(response.body);
-          }
-    
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('friends');
       }),
@@ -103,6 +113,32 @@ describe("user controller tests", () => {
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
         expect(response.body).toHaveProperty('noFriends');
-      });
+      }),
+      it("send invite to friend",  async () => {
+        const response = await request(app)
+          .post('/users/nofriends') 
+          .set('Authorization', `Bearer ${token}`)
+          .send({id: testUserID});
+    
+        expect(response.status).toBe(200);
+        expect(response.body.sucess).toBe(true);
+        expect(response.body.message).toBe('invite send sucessfully');
+      }),
+      it("user got invite", async ()=>{
+        const user = await User.findById(testUserID);
+        expect(user?.invites).toHaveLength(1)
+      }),
 
-});
+
+      it("edit user profile",  async () => {
+        const response = await request(app)
+          .put(`/user/edit/${testUser2ID}`) 
+          .set('Authorization', `Bearer ${token}`)
+          .send({ name: 'UpdatedName' });
+    
+        expect(response.status).toBe(201);
+        expect(response.body.sucess).toBe(true);
+        expect(response.body.message).toBe('edited user');
+      });
+  
+    })
