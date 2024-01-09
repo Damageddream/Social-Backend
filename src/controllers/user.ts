@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
 import { UserIwithID, UserWithObjectsIDs } from "../interfaces/userI";
@@ -196,7 +196,6 @@ export const postInvites = async (
       User.findById(userRequesting._id),
       User.findById(id),
     ]);
-    console.log(id, userRequesting._id)
     // check if users are not already friends and return if they are
     if (userAnswering?.friends.includes(objectId)) {
       return res.status(409).json({ message: "you already are friends" });

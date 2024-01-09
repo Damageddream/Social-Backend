@@ -97,6 +97,10 @@ describe("user controller tests", () => {
         expect(response.body).toHaveProperty('token');
         token = response.body.token;
         expect(response.body.user.name).toBe('TestUser');
+        // add invite to test user for testing later
+        await User.findByIdAndUpdate(testUser2ID, {$push: {invites: testUserID}})
+        await User.findByIdAndUpdate(testUserID, {$push: {invitesSent: testUser2ID}})
+
       }),
       it("get friends of test user",  async () => {
         const response = await request(app)
@@ -139,6 +143,26 @@ describe("user controller tests", () => {
         expect(response.status).toBe(201);
         expect(response.body.sucess).toBe(true);
         expect(response.body.message).toBe('edited user');
-      });
+      }),
+      it("test post invites", async ()=>{
+        const response = await request(app)
+          .post('/users/invites') 
+          .set('Authorization', `Bearer ${token}`)
+          .send({id: testUserID, answer: "accept"}); 
+
+        expect(response.status).toBe(200);
+        expect(response.body.sucess).toBe(true);
+        expect(response.body.message).toBe('invite was handle correctly');
+      }),
+      it("test if already friend, response is correct", async ()=>{
+        const response = await request(app)
+          .post('/users/invites') 
+          .set('Authorization', `Bearer ${token}`)
+          .send({id: testUserID, answer: "accept"}); 
+
+        expect(response.status).toBe(409);
+        expect(response.body.message).toBe('you already are friends');
+      })
+
   
     })
