@@ -11,6 +11,7 @@ import {
   ExtractJwt as ExtractJWT,
 } from "passport-jwt";
 import { UserI } from "../interfaces/userI";
+import mongoose from "mongoose";
 
 
 dotenv.config();
@@ -53,6 +54,8 @@ describe("user controller tests", () => {
   let token: string;
   let testUserID: string;
   let testUser2ID: string;
+  let postId: string;
+  let friendPostId: string;
   beforeAll(async () => {
     await connectDB();
     const user = User.build({
@@ -65,6 +68,15 @@ describe("user controller tests", () => {
     });
     testUserID = user._id.toString();
     await user.save();
+    const friendPost = Post.build({
+      text: 'This is a friend post',
+      author: new mongoose.Types.ObjectId(testUserID),
+      timestamp: new Date(),
+      likes: [],
+      comments: [],
+    });
+    await friendPost.save(); 
+    friendPostId = friendPost._id.toString();
   });
 
   afterAll(async () => {
@@ -96,15 +108,67 @@ describe("user controller tests", () => {
     token = response.body.token;
     const user = await User.findOne({ name: 'TestUser' });
     testUser2ID = user?._id.toString() || "";
+    // add users as friends for testing only friends posts on wall
+    await User.findByIdAndUpdate(testUser2ID, {$push: {friends: testUserID}})
+    await User.findByIdAndUpdate(testUserID, {$push: {friends: testUser2ID}})
+
   }),
   it('should create a post', async () => {
     const response = await request(app)
       .post('/posts')
       .set('Authorization', `Bearer ${token}`)
       .send({ text: 'This is a test post' });
-
+    postId = response.body._id;
     expect(response.status).toBe(201);
     expect(response.body.text).toBe('This is a test post');
     expect(response.body.author).toBe(testUser2ID);
-  })
+  }),
+    it('should update a post', async () => {
+    const response = await request(app)
+      .put(`/posts/${postId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ text: 'This is an updated post' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.text).toBe('This is an updated post');
+  }),
+  it('should add a like to a post', async () => {
+    const response = await request(app)
+      .post(`/posts/${postId}/like`)
+      .set('Authorization', `Bearer ${token}`);
+    
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('added like');
+  }),
+  it('should remove a like from a post', async () => {
+
+    const response = await request(app)
+      .post(`/posts/${postId}/like`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('removed like');
+  }),
+  it('should get posts from friends', async () => {
+    const response = await request(app)
+      .get(`/wall`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('sucesfully fetched posts');
+    expect(response.body.posts[0]._id).toBe(friendPostId);
+    expect(response.body.posts[0].author._id).toBe(testUserID);
+  }),
+  it('should delete a post', async () => {
+    const response = await request(app)
+      .delete(`/posts/${postId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('post removed');
+  });
+
+
+
 });
+

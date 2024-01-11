@@ -113,7 +113,8 @@ export const updatePost = async (
         }
         // author for testing replace with params or req.author
         await Post.findByIdAndUpdate(post._id, updatedPost);
-        return res.status(201).send(post);
+        const newPost = await Post.findById(post._id);
+        return res.status(201).send(newPost);
       } catch (err: Error | any) {
         next(err);
       }
