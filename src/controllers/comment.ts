@@ -25,9 +25,11 @@ export const postComment = async (
   next: NextFunction
 ) => {
   try {
+    
     const postId = req.body.post;
     const text = req.body.text;
     const user = req.user as UserWithObjectsIDs;
+
     const comment = Comment.build({
       text,
       author: user._id,
@@ -35,6 +37,7 @@ export const postComment = async (
       likes: [],
       post: new Types.ObjectId(req.params.postId),
     });
+    console.log(comment)
     const addedComment = await comment.save();
     const newCommentId = addedComment._id;
     await Post.findByIdAndUpdate(postId, { $push: { comments: newCommentId } });

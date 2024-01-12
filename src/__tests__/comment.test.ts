@@ -123,4 +123,16 @@ describe("user controller tests", () => {
     expect(response.status).toBe(201);
     expect(response.body.text).toBe('This is a test post');
     expect(response.body.author).toBe(testUser2ID);
-  }) })
+  }),
+  it('should create a comment', async () => {
+    const response = await request(app)
+      .post(`/posts/${postId}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ text: 'This is a test comment', post: postId });
+
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('New comment added');
+  });
+
+
+})
