@@ -37,7 +37,6 @@ export const postComment = async (
       likes: [],
       post: new Types.ObjectId(req.params.postId),
     });
-    console.log(comment)
     const addedComment = await comment.save();
     const newCommentId = addedComment._id;
     await Post.findByIdAndUpdate(postId, { $push: { comments: newCommentId } });

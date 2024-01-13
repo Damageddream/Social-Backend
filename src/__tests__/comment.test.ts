@@ -2,7 +2,6 @@ import router from "../routes";
 import express from "express";
 import { connectDB, dropDB } from "../utils/mongoConfigTesting";
 import { describe } from "node:test";
-import { Post } from "../models/post.model";
 import { Comment } from "../models/comment.model";
 import dotenv from "dotenv";
 import { User } from "../models/user.model";
@@ -12,7 +11,7 @@ import {
   ExtractJwt as ExtractJWT,
 } from "passport-jwt";
 import { UserI } from "../interfaces/userI";
-import mongoose from "mongoose";
+
 
 
 dotenv.config();
@@ -53,31 +52,12 @@ const request = require("supertest");
 
 describe("user controller tests", () => {
   let token: string;
-  let testUserID: string;
   let testUser2ID: string;
   let postId: string;
-  let friendPostId: string;
+  let commentId: string;
   beforeAll(async () => {
     await connectDB();
-    const user = User.build({
-      name: "testUser1",
-      password: "testpassword1",
-      photo: "http://localhost:3000/static/user.png",
-      friends: [],
-      invites: [],
-      invitesSent: [],
-    });
-    testUserID = user._id.toString();
-    await user.save();
-    const friendPost = Post.build({
-      text: 'This is a friend post',
-      author: new mongoose.Types.ObjectId(testUserID),
-      timestamp: new Date(),
-      likes: [],
-      comments: [],
-    });
-    await friendPost.save(); 
-    friendPostId = friendPost._id.toString();
+
   });
 
   afterAll(async () => {
@@ -109,9 +89,6 @@ describe("user controller tests", () => {
     token = response.body.token;
     const user = await User.findOne({ name: 'TestUser' });
     testUser2ID = user?._id.toString() || "";
-    // add users as friends for testing only friends posts on wall
-    await User.findByIdAndUpdate(testUser2ID, {$push: {friends: testUserID}})
-    await User.findByIdAndUpdate(testUserID, {$push: {friends: testUser2ID}})
 
   }),
   it('should create a post', async () => {
@@ -132,7 +109,41 @@ describe("user controller tests", () => {
 
     expect(response.status).toBe(201);
     expect(response.body.message).toBe('New comment added');
+    const comment = await Comment.findOne({ text: 'This is a test comment' })
+    commentId = comment?._id.toString() || "";
+    console.log(commentId);
+  }),
+    it('should update a comment', async () => {
+    const response = await request(app)
+      .put(`/comments/${commentId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ text: 'This is an updated comment', post: postId, likes:[]});
+
+    expect(response.status).toBe(201);
+    expect(response.body.text).toBe('This is an updated comment');
+  }),
+  it('should like a comment', async () => {
+    const response = await request(app)
+      .post(`/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('added like');
+  }),
+  it('should unlike a comment', async () => {
+    const response = await request(app)
+      .post(`/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('removed like');
+  }),
+  it('should delete a comment', async () => {
+    const response = await request(app)
+      .delete(`/comments/${commentId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('comment removed');
   });
-
-
 })
